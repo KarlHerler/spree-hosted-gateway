@@ -1,8 +1,8 @@
 namespace :hosted_gateway do
   desc "Copies all migrations and assets (NOTE: This will be obsolete with Rails 3.1)"
   task :install do
-    Rake::Task['spree-hosted-gateway:install:migrations'].invoke
-    Rake::Task['spree-hosted-gateway:install:assets'].invoke
+    Rake::Task['hosted_gateway:install:migrations'].invoke
+    Rake::Task['hosted_gateway:install:assets'].invoke
   end
 
   namespace :install do
