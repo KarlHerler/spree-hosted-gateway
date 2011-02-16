@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.platform    = Gem::Platform::RUBY
-  s.name        = 'hosted_gateway'
+  s.name        = 'spree-hosted-gateway'
   s.version     = '1.0.0'
   s.summary     = 'A Spree extension adding support for an external payment gateway service (i.e. offsite payment)'
   #s.description = 'Add (optional) gem description here'
