@@ -6,7 +6,7 @@ require 'rake/testtask'
 require 'rake/packagetask'
 require 'rake/gempackagetask'
 
-spec = eval(File.read('hosted_gateway.gemspec'))
+spec = eval(File.read('spree-hosted-gateway.gemspec'))
 
 Rake::GemPackageTask.new(spec) do |p|
   p.gem_spec = spec
