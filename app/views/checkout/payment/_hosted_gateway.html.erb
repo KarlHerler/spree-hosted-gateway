@@ -12,7 +12,7 @@
       <% #Finally, add the new inputs to the form to submit what we need. -%>
       $('form').append("<%= escape_javascript(hidden_field_tag(:return_url, payment_method.get_return_url_for(@order, false))) %>");
       $('form').append("<%= escape_javascript(hidden_field_tag(:custom_data, payment_method.get_custom_data_for(@order))) %>");
-      $('form').append("<%= escape_javascript(hidden_field_tag(:amount, payment_method.get_total_for(@order))) %>");
+      
 
       <% payment_method.additional_attributes.each do |key, value| %>
         $('form').append("<%= escape_javascript(hidden_field_tag(key.to_sym, value.to_s)) %>");
