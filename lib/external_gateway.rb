@@ -60,7 +60,7 @@ class ExternalGateway < PaymentMethod
   #At a minimum, you should use this field to POST the order number and payment method id - but you can
   #always override it to do something else.
   def get_custom_data_for(order)
-    return {"order_number" => order.number, "payment_method_id" => self.id}.to_json
+    return {"order_number" => order.number, "payment_method_id" => self.id, "order_token" => order.token}.to_json
   end
 
   #This is another case of stupid payment gateways, but does allow you to
@@ -75,7 +75,7 @@ class ExternalGateway < PaymentMethod
 
   #The payment gateway I'm using only accepts rounded-dollar amounts. Stupid.
   #I've added this method nonetheless, so that I can easily override it to round the amount
-  def get_total_for_(order)
+  def get_total_for(order)
     return order.total
   end
 
