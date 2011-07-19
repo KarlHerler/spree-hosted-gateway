@@ -1,5 +1,7 @@
 class ExternalGateway < PaymentMethod
 
+  require 'digest/sha1'
+  require 'date'
   #We need access to routes to correctly assemble a return url
  include ActionController::UrlWriter
 
@@ -20,6 +22,9 @@ class ExternalGateway < PaymentMethod
 
   #An array of preferences that should not be automatically inserted into the form
   INTERNAL_PREFERENCES = [:server, :status_param_key, :successful_transaction_value, :custom_data]
+
+
+
 
   #Arbitrarily, this class is called ExternalGateway, but the extension is a whole is named 'HostedGateway', so
   #this is what we want our checkout/admin view partials to be named.
@@ -101,5 +106,272 @@ class ExternalGateway < PaymentMethod
     self.preferences.select { |key| !INTERNAL_PREFERENCES.include?(key[0].to_sym) }
   end
 
+
+  #Maksuturva specific methods added by: Karl Herler
+
+  #hardcoded
+  preference :pmt_action, :string, :default => 'NEW_PAYMENT_EXTENDED'
+  preference :pmt_version, :string, :default => '0004'
+  preference :pmt_currency, :string, :default => "EUR"
+
+  #semihardcoded (should be gotten from admin)
+  preference :pmt_sellerid, :string, :default => 'testikauppias'
+  preference :pmt_id, :string, :default => '11223344556677889900' 
+  preference :pmt_userlocale, :string, :default => "fi_FI"
+  preference :pmt_escrow, :string, :default => "Y"
+  preference :pmt_escrowchangeallowed, :string, :default => "N"
+  preference :pmt_okreturn, :string, :default => "http://127.0.0.1/"
+  preference :pmt_errorreturn, :string, :default => "http://127.0.0.1/404/"
+  preference :pmt_cancelreturn, :string, :default => "http://127.0.0.1/cancel/"
+  preference :pmt_delayedpayreturn, :string, :default => "http://127.0.0.1/delayed/"
+
+  #should be dynamic
+  preference :pmt_reference, :string, :default => '1232'
+  preference :pmt_duedate, :string, :default => "01.00.0000"
+
+
+  preference :pmt_amount, :string, :default => "10,00"
+
+
+  
+  preference :pmt_charset, :string, :default => "ISO-8859-1"
+  preference :pmt_charsethttp, :string, :default => "ISO-8859-1"
+  preference :pmt_hashversion, :string, :default => "SHA-1"
+  preference :pmt_hash, :string, :default => "dadab9f6ca0b2885468e3245e3ee0e5d34b1351f"
+  preference :pmt_keygeneration, :string, :default => "001"
+
+
+  #added a generating method
+  def get_maksuturva(order)
+    get_hash(order)
+    #get_buyername(order)
+    #get_products(order)
+  end
+
+  #This method adds assigns order id to pmt_orderid
+  def get_orderid(order)
+    return order.number
+  end
+
+  def get_amount(order)
+    return order.total.round(2).to_s
+  end
+
+  #gets data for pmt_buyername
+  def get_buyername(order)
+    return "#{order.bill_address.firstname} #{order.bill_address.lastname}"
+  end
+
+  #gets data for adresses
+  preference :pmt_buyeraddress, :string, :default => "studentbyn 5 A 2"
+  preference :pmt_buyerpostalcode, :string, :default => "20540"
+  preference :pmt_buyercity, :string, :default => "Turku"
+  preference :pmt_buyercountry, :string, :default => "FI"
+  preference :pmt_buyerphone, :string, :default => "0503753536"
+  
+  #gets data for pmt_buyeraddress
+  def get_buyeraddress(order)
+    return order.bill_address.address1
+  end
+
+  #gets data for pmt_buyerpostalcode
+  def get_buyerpostalcode(order)
+    return order.bill_address.zipcode
+  end
+
+  #gets data for pmt_buyercity
+  def get_buyercity(order)
+    return order.bill_address.city
+  end
+
+  #gets data for pmt_buyercountry
+  def get_buyercountry(order)
+    return order.bill_address.country.to_s.slice(0, 2).upcase
+  end
+
+  #gets data for pmt_buyerphone
+  def get_buyerphone(order)
+    return order.bill_address.phone
+  end
+
+  #gets data for pmt_buyeremail
+  def get_buyeremail(order)
+    return ""
+    #return order.bill_address.email
+  end
+
+
+  preference :pmt_deliveryname, :string, :default => "Bengt"
+  preference :pmt_deliveryaddress, :string, :default => "studentbyn 5 A 2"
+  preference :pmt_deliverypostalcode, :string, :default => "20540"
+  preference :pmt_deliverycity, :string, :default => "Turku"
+  preference :pmt_deliverycountry, :string, :default => "FI"
+
+  #gets data for pmt_deliveryname
+  def get_deliveryname(order)
+    return "#{order.ship_address.firstname} #{order.ship_address.lastname}"
+  end
+
+  #gets data for pmt_deliveryaddress
+  def get_deliveryaddress(order)
+    return order.ship_address.address1
+  end
+
+  #gets data for pmt_deliverypostalcode
+  def get_deliverypostalcode(order)
+    return order.ship_address.zipcode
+  end
+
+  #gets data for pmt_deliverycity
+  def get_deliverycity(order)
+    return order.ship_address.city
+  end
+
+  #gets data for pmt_deliverycountry
+  def get_deliverycountry(order)
+    return order.ship_address.country.to_s.slice(0, 2).upcase
+  end
+
+  #gets data for pmt_deliveryphone
+  def get_deliveryphone(order)
+    return order.ship_address.phone
+  end
+
+  #gets data for pmt_deliveryemail
+  def get_deliveryemail(order)
+    return ""
+    #return order.bill_address.email
+  end
+
+
+
+  preference :pmt_sellercosts, :string, :default => "2,00"
+
+  
+  #Gets the data for pmt_rows
+  def get_rows(order)
+    return order.item_count
+  end
+
+  def get_sum(order)
+    return ""
+  end
+
+
+  preference :pmt_row_name1, :string, :default => "Hat"
+  preference :pmt_row_desc1, :string, :default => "A hat with three(3) corners."
+  
+  preference :pmt_row_quantity1, :string, :default => "1"
+  
+  preference :pmt_row_unit1, :string, :default => "kpl"
+  
+  preference :pmt_row_deliverydate1, :string, :default => "14.06.2011"
+
+  preference :pmt_row_price_net1, :string, :default => "10"
+  
+  preference :pmt_row_vat1, :string, :default => "0,00"
+  
+  
+
+  preference :pmt_row_type1, :string, :default => "1"
+
+
+  preference :pmt_row_name2, :string, :default => "Hat"
+  preference :pmt_row_desc2, :string, :default => "A hat with three(3) corners."
+  preference :pmt_row_quantity2, :string, :default => "1"
+  preference :pmt_row_unit2, :string, :default => "kpl"
+  preference :pmt_row_deliverydate2, :string, :default => "14.06.2011"
+  preference :pmt_row_price_net2, :string, :default => "2"
+  preference :pmt_row_vat2, :string, :default => "0,00"
+  preference :pmt_row_discountpercentage2, :string, :default => "0,00"
+  preference :pmt_row_type2, :string, :default => "3"
+
+  def get_products(order)
+    date = DateTime.now
+    products = Array.new();
+    
+    order.products.each_with_index do |product, i|
+      products[i] = {
+        :name               => product.name,
+        :desc               => product.description, 
+        :price_vat          => product.price, 
+        :quantity           => order.line_items[0].quantity,
+        :unit               => "kpl",
+        :deliverydate       => "#{date.day}.#{date.month}.#{date.year}",
+        :price_net          => product.price-(product.price*product.tax_category.tax_rates[0].amount),
+        :vat                => product.tax_category.tax_rates[0].amount,
+        :discountpercentage => "0,00",
+        :type => "1"
+      }
+    end
+
+    return products
+  end
+
+  def get_sellercosts(order)
+    return order.ship_total.round(2).to_s
+  end
+
+  def get_hash(order)
+    hashprimer = ""
+    hashprimer = hashprimer + self.preferences["pmt_action"] + "&" unless self.preferences["pmt_action"].nil?
+    hashprimer = hashprimer + self.preferences["pmt_version"] + "&" unless self.preferences["pmt_version"].nil?
+    hashprimer = hashprimer + self.preferences["pmt_selleriban"] + "&" unless self.preferences["pmt_selleriban"].nil?
+    hashprimer = hashprimer + self.preferences["pmt_id"] + "&" unless self.preferences["pmt_id"].nil?
+    
+    hashprimer = hashprimer + get_orderid(order) + "&" unless get_orderid(order).nil?
+    
+    hashprimer = hashprimer + self.preferences["pmt_reference"] + "&" unless self.preferences["pmt_reference"].nil?
+    hashprimer = hashprimer + self.preferences["pmt_duedate"] + "&" unless self.preferences["pmt_duedate"].nil?
+    
+    hashprimer = hashprimer + get_amount(order) + "&" unless get_amount(order).nil?
+    
+
+    hashprimer = hashprimer + self.preferences["pmt_currency"] + "&" unless self.preferences["pmt_currency"].nil?
+    hashprimer = hashprimer + self.preferences["pmt_okreturn"] + "&" unless self.preferences["pmt_okreturn"].nil?
+    hashprimer = hashprimer + self.preferences["pmt_errorreturn"] + "&" unless self.preferences["pmt_errorreturn"].nil?
+    hashprimer = hashprimer + self.preferences["pmt_cancelreturn"] + "&" unless self.preferences["pmt_cancelreturn"].nil?
+    hashprimer = hashprimer + self.preferences["pmt_delayedpayreturn"] + "&" unless self.preferences["pmt_delayedpayreturn"].nil?
+    hashprimer = hashprimer + self.preferences["pmt_escrow"] + "&" unless self.preferences["pmt_escrow"].nil?
+    hashprimer = hashprimer + self.preferences["pmt_escrowchangeallowed"] + "&" unless self.preferences["pmt_escrowchangeallowed"].nil?
+    
+    hashprimer = hashprimer + get_buyername(order) + "&" unless get_buyername(order).nil?
+    # hashprimer = hashprimer + params[k]+"&" if k=="pmt_paymentmethod"
+    # hashprimer = hashprimer + params[k]+"&" if k=="pmt_buyeridentificationcode"
+    hashprimer = hashprimer + get_buyeraddress(order) + "&" unless get_buyeraddress(order).nil?
+    hashprimer = hashprimer + get_buyerpostalcode(order) + "&" unless get_buyerpostalcode(order).nil?
+    hashprimer = hashprimer + get_buyercity(order) + "&" unless get_buyercity(order).nil?
+    hashprimer = hashprimer + get_buyercountry(order) + "&" unless get_buyercountry(order).nil?
+
+
+    hashprimer = hashprimer + get_deliveryname(order) + "&" unless get_deliveryname(order).nil?
+    # hashprimer = hashprimer + params[k]+"&" if k=="pmt_paymentmethod"
+    # hashprimer = hashprimer + params[k]+"&" if k=="pmt_deliveryidentificationcode"
+    hashprimer = hashprimer + get_deliveryaddress(order) + "&" unless get_deliveryaddress(order).nil?
+    hashprimer = hashprimer + get_deliverypostalcode(order) + "&" unless get_deliverypostalcode(order).nil?
+    hashprimer = hashprimer + get_deliverycity(order) + "&" unless get_deliverycity(order).nil?
+    hashprimer = hashprimer + get_deliverycountry(order) + "&" unless get_deliverycountry(order).nil?
+    
+    hashprimer = hashprimer + get_sellercosts(order) + "&" unless get_sellercosts(order).nil?
+
+    get_products(order).each do |n|
+      hashprimer = hashprimer + n[:name] + "&"
+      hashprimer = hashprimer + n[:desc] + "&"
+      hashprimer = hashprimer + n[:price_vat].round(2).to_s + "&"
+      hashprimer = hashprimer + n[:quantity].to_s + "&"
+      hashprimer = hashprimer + n[:unit] + "&"
+      hashprimer = hashprimer + n[:discountpercentage].to_s + "&"
+      hashprimer = hashprimer + n[:deliverydate] + "&"
+      hashprimer = hashprimer + n[:price_net].to_s + "&"
+      hashprimer = hashprimer + n[:vat].to_s + "&"
+      hashprimer = hashprimer + n[:discountpercentage].to_s + "&"
+      hashprimer = hashprimer + n[:type].to_s + "&"
+    end
+
+    hashprimer = hashprimer + "11223344556677889900&"
+
+    return hashprimer
+    #return Digest::SHA1.hexdigest hashprimer
+  end
 end
 
