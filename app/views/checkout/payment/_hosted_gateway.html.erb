@@ -10,17 +10,44 @@
       $('form').attr('method', 'post');
       $('form').attr('accept-charset', 'ISO-8859-1');
 
-      <% #Finally, add the new inputs to the form to submit what we need. -%>
-      //$('form').append("<%= escape_javascript(hidden_field_tag(:return_url, payment_method.get_return_url_for(@order, false))) %>");
-      //$('form').append("<%= escape_javascript(hidden_field_tag(:custom_data, payment_method.get_custom_data_for(@order))) %>");
-      //$('form').append("<%= escape_javascript(hidden_field_tag(:pmt_amount, payment_method.get_total_for(@order))) %>");
-      //$('form').append(<%= escape_javascript(hidden_field_tag(:pmt_amount, payment_method.get_total_for(@order))) %>");
 
       console.log("<%= payment_method.get_maksuturva(@order) %>");
       console.log("<%= payment_method.get_rows(@order) %>");
 
+      $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_amount, payment_method.get_amount(@order))) %>");
+
+      $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_buyername, payment_method.get_buyername(@order))) %>");
+      $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_buyeraddress, payment_method.get_buyeraddress(@order))) %>");
+      $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_buyerpostalcode, payment_method.get_buyerpostalcode(@order))) %>");
+      $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_buyercity, payment_method.get_buyercity(@order))) %>");
+      $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_buyercountry, payment_method.get_buyercountry(@order))) %>");
+
+
+      $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_deliveryname, payment_method.get_deliveryname(@order))) %>");
+      $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_deliveryaddress, payment_method.get_deliveryaddress(@order))) %>");
+      $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_deliverypostalcode, payment_method.get_deliverypostalcode(@order))) %>");
+      $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_deliverycity, payment_method.get_deliverycity(@order))) %>");
+      $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_deliverycountry, payment_method.get_deliverycountry(@order))) %>");
+
+      
       $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_rows, payment_method.get_rows(@order))) %>");
       $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_orderid, payment_method.get_orderid(@order))) %>");
+
+      $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_hash, payment_method.get_hash(@order))) %>");
+
+      // loop through the billing and shipping address
+
+      <% payment_method.get_products(@order).each_with_index do |n,i| %>
+        $('form').append("<%= escape_javascript(hidden_field_tag("pmt_row_name#{(i+1)}", n[:name])) %>");
+        $('form').append("<%= escape_javascript(hidden_field_tag("pmt_row_desc#{(i+1)}", n[:desc])) %>");
+        $('form').append("<%= escape_javascript(hidden_field_tag("pmt_row_quantity#{(i+1)}", n[:quantity])) %>");
+        $('form').append("<%= escape_javascript(hidden_field_tag("pmt_row_unit#{(i+1)}", n[:unit])) %>");
+        $('form').append("<%= escape_javascript(hidden_field_tag("pmt_row_deliverydate#{(i+1)}", n[:deliverydate])) %>");
+        $('form').append("<%= escape_javascript(hidden_field_tag("pmt_row_price_gross#{(i+1)}", n[:price_gross])) %>");
+        $('form').append("<%= escape_javascript(hidden_field_tag("pmt_row_vat#{(i+1)}", n[:vat])) %>");
+        $('form').append("<%= escape_javascript(hidden_field_tag("pmt_row_discountpercentage#{(i+1)}", n[:discountpercentage])) %>");
+        $('form').append("<%= escape_javascript(hidden_field_tag("pmt_row_type#{(i+1)}", n[:type])) %>");
+      <% end %>
       
       <% payment_method.additional_attributes.each do |key, value| %>
         //console.log("<%= key %>, <%= value %>")
@@ -33,10 +60,7 @@
   <% end -%>
 <% end -%>
 
-
-
 <div class="external_gateway redirect_notice">
   <%= image_tag 'proceed.png', :size => '48x48' -%>
   <%= I18n.translate('external_gateway.checkout.redirect_notice') %>
 </div>
-
