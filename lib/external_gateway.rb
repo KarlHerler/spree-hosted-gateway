@@ -247,12 +247,12 @@ class ExternalGateway < PaymentMethod
 
 
 
-  preference :pmt_sellercosts, :string, :default => "0,00"
+  #preference :pmt_sellercosts, :string, :default => "0,00"
 
   
   #Gets the data for pmt_rows
   def get_rows(order)
-    return order.item_count
+    return (order.item_count+1)
   end
 
   def get_sum(order)
@@ -279,7 +279,7 @@ class ExternalGateway < PaymentMethod
       :quantity           => "1",
       :unit               => "kpl",
       :deliverydate       => "#{date.day}.#{date.month}.#{date.year}",
-      :price_gross        => num_to_s(order.ship_total.round(2)),
+      :price_net          => num_to_s(order.ship_total.round(2)),
       :vat                => "0,00",
       :discountpercentage => "0,00",
       :type => "2"
@@ -300,8 +300,8 @@ class ExternalGateway < PaymentMethod
         :quantity           => order.line_items[0].quantity,
         :unit               => "kpl",
         :deliverydate       => "#{date.day}.#{date.month}.#{date.year}",
-        :price_gross        => num_to_s(product.price.round(2)),
-        :vat                => product.tax_category.tax_rates[0].amount,
+        :price_net          => num_to_s(product.price.round(2)),
+        :vat                => num_to_s(product.tax_category.tax_rates[0].amount*100),
         :discountpercentage => "0,00",
         :type => "1"
       }
@@ -313,6 +313,7 @@ class ExternalGateway < PaymentMethod
   end
 
   def get_sellercosts(order)
+    #return "0,00"
     return num_to_s(order.ship_total.round(2))
   end
 
@@ -357,6 +358,7 @@ class ExternalGateway < PaymentMethod
     hashprimer = hashprimer + get_deliverycountry(order) + "&" unless get_deliverycountry(order).nil?
     
     hashprimer = hashprimer + get_sellercosts(order) + "&" unless get_sellercosts(order).nil?
+    
 
     get_products(order).each do |n|
       hashprimer = hashprimer + n[:name] + "&"
@@ -365,7 +367,7 @@ class ExternalGateway < PaymentMethod
       hashprimer = hashprimer + n[:quantity].to_s + "&"
       hashprimer = hashprimer + n[:unit] + "&"
       hashprimer = hashprimer + n[:deliverydate] + "&"
-      hashprimer = hashprimer + n[:price_gross].to_s + "&"
+      hashprimer = hashprimer + n[:price_net].to_s + "&"
       hashprimer = hashprimer + n[:vat].to_s + "&"
       hashprimer = hashprimer + n[:discountpercentage].to_s + "&"
       hashprimer = hashprimer + n[:type].to_s + "&"
@@ -373,8 +375,8 @@ class ExternalGateway < PaymentMethod
 
     hashprimer = hashprimer + "11223344556677889900&"
 
-    return hashprimer
-    #return Digest::SHA1.hexdigest hashprimer
+    #return hashprimer
+    return Digest::SHA1.hexdigest hashprimer
   end
 end
 

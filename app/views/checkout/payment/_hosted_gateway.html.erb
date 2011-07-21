@@ -11,8 +11,7 @@
       $('form').attr('accept-charset', 'ISO-8859-1');
 
 
-      console.log("<%= payment_method.get_maksuturva(@order) %>");
-      console.log("<%= payment_method.get_rows(@order) %>");
+      $('form').append("<%= payment_method.get_hash(@order) %>");
 
       $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_amount, payment_method.get_amount(@order))) %>");
 
@@ -35,15 +34,18 @@
 
       $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_hash, payment_method.get_hash(@order))) %>");
 
+      $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_sellercosts, payment_method.get_sellercosts(@order))) %>");
+
       // loop through the billing and shipping address
 
       <% payment_method.get_products(@order).each_with_index do |n,i| %>
+        //$('form').append("<%= n %>, ")
         $('form').append("<%= escape_javascript(hidden_field_tag("pmt_row_name#{(i+1)}", n[:name])) %>");
         $('form').append("<%= escape_javascript(hidden_field_tag("pmt_row_desc#{(i+1)}", n[:desc])) %>");
         $('form').append("<%= escape_javascript(hidden_field_tag("pmt_row_quantity#{(i+1)}", n[:quantity])) %>");
         $('form').append("<%= escape_javascript(hidden_field_tag("pmt_row_unit#{(i+1)}", n[:unit])) %>");
         $('form').append("<%= escape_javascript(hidden_field_tag("pmt_row_deliverydate#{(i+1)}", n[:deliverydate])) %>");
-        $('form').append("<%= escape_javascript(hidden_field_tag("pmt_row_price_gross#{(i+1)}", n[:price_gross])) %>");
+        $('form').append("<%= escape_javascript(hidden_field_tag("pmt_row_price_net#{(i+1)}", n[:price_net])) %>");
         $('form').append("<%= escape_javascript(hidden_field_tag("pmt_row_vat#{(i+1)}", n[:vat])) %>");
         $('form').append("<%= escape_javascript(hidden_field_tag("pmt_row_discountpercentage#{(i+1)}", n[:discountpercentage])) %>");
         $('form').append("<%= escape_javascript(hidden_field_tag("pmt_row_type#{(i+1)}", n[:type])) %>");
