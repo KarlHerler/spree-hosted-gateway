@@ -131,8 +131,8 @@ class ExternalGateway < PaymentMethod
   
 
   #semihardcoded (should be gotten from admin)
-  preference :pmt_sellerid, :string, :default => 'testikauppias'
-  preference :pmt_id, :string, :default => '11223344556677889900' 
+  preference :pmt_sellerid, :string
+  preference :pmt_id, :string
   preference :pmt_userlocale, :string, :default => "fi_FI"
   preference :pmt_escrow, :string, :default => "Y"
   preference :pmt_escrowchangeallowed, :string, :default => "N"
@@ -140,6 +140,7 @@ class ExternalGateway < PaymentMethod
   preference :pmt_errorreturn, :string, :default => "http://127.0.0.1/404/"
   preference :pmt_cancelreturn, :string, :default => "http://127.0.0.1/cancel/"
   preference :pmt_delayedpayreturn, :string, :default => "http://127.0.0.1/delayed/"
+  preference :secret, :string, :default => "11223344556677889900"
 
   #should be dynamic
   preference :pmt_reference, :string, :default => '1232'
@@ -202,9 +203,11 @@ class ExternalGateway < PaymentMethod
   end
 
   #gets data for pmt_buyeremail
+  #preference :pmt_buyeremail, :string, :default => "hi@karlherler.com"
+  #preference :pmt_deliveryemail, :string, :default => "hi@karlherler.com"
   def get_buyeremail(order)
-    return ""
-    #return order.bill_address.email
+    #return ""
+    return order.bill_address.email
   end
 
 
@@ -373,7 +376,7 @@ class ExternalGateway < PaymentMethod
       hashprimer = hashprimer + n[:type].to_s + "&"
     end
 
-    hashprimer = hashprimer + "11223344556677889900&"
+    hashprimer = hashprimer + self.preferences["secret"] +"&"
 
     #return hashprimer
     return Digest::SHA1.hexdigest hashprimer

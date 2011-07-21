@@ -11,8 +11,6 @@
       $('form').attr('accept-charset', 'ISO-8859-1');
 
 
-      $('form').append("<%= payment_method.get_hash(@order) %>");
-
       $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_amount, payment_method.get_amount(@order))) %>");
 
       $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_buyername, payment_method.get_buyername(@order))) %>");
