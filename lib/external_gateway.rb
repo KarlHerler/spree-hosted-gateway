@@ -21,7 +21,7 @@ class ExternalGateway < PaymentMethod
   preference :successful_transaction_value, :string, :default => 'success'
 
   #An array of preferences that should not be automatically inserted into the form
-  INTERNAL_PREFERENCES = [:server, :status_param_key, :successful_transaction_value, :custom_data]
+  INTERNAL_PREFERENCES = [:server, :status_param_key, :successful_transaction_value, :custom_data, :pmt_okreturn, :pmt_errorreturn]
 
 
   def num_to_s(param)
@@ -49,18 +49,20 @@ class ExternalGateway < PaymentMethod
   #to find the order from the parameters we sent the gateway as part of the return URL and returns it
   #along with the transaction status.
   def process_response(params)
-    begin
-      #Find order
-      order = Order.find_by_number(ExternalGateway.parse_custom_data(params)["order_number"])
-      raise ActiveRecord::RecordNotFound if order.token != ExternalGateway.parse_custom_data(params)["order_token"]
+     begin
+       #return [nil, false]
+       #Find order
+       order = Order.find_by_number(ExternalGateway.parse_custom_data(params)["id"])
+       puts "#{order}"
+       raise ActiveRecord::RecordNotFound if order.token != ExternalGateway.parse_custom_data(params)["order_token"]
 
-      #Check for successful response
-      transaction_succeeded = params[self.preferred_status_param_key.to_sym] == self.preferred_successful_transaction_value.to_s
-      return [order, transaction_succeeded]
-    rescue ActiveRecord::RecordNotFound
-      #Return nil and false if we couldn't find the order - this is probably bad.
-      return [nil, false]
-    end
+       #Check for successful response
+       transaction_succeeded = params[self.preferred_status_param_key.to_sym] == self.preferred_successful_transaction_value.to_s
+       return [order, transaction_succeeded]
+     rescue ActiveRecord::RecordNotFound
+       #Return nil and false if we couldn't find the order - this is probably bad.
+       return [nil, false]
+     end
   end
 
   #This is basically a attr_reader for server, but makes sure that it has been set.
@@ -84,7 +86,8 @@ class ExternalGateway < PaymentMethod
   #that the controller can find what it needs to.
   #By default, we try and parse JSON out of the param.
   def self.parse_custom_data(params)
-    return ActiveSupport::JSON.decode(params[:custom_data])
+    return (params[:custom_data].nil?) ? "" : ActiveSupport::JSON.decode(params[:custom_data]) 
+    #return ActiveSupport::JSON.decode(params[:custom_data])
   end
 
 
@@ -136,10 +139,10 @@ class ExternalGateway < PaymentMethod
   preference :pmt_userlocale, :string, :default => "fi_FI"
   preference :pmt_escrow, :string, :default => "Y"
   preference :pmt_escrowchangeallowed, :string, :default => "N"
-  preference :pmt_okreturn, :string, :default => "http://127.0.0.1/"
-  preference :pmt_errorreturn, :string, :default => "http://127.0.0.1/404/"
-  preference :pmt_cancelreturn, :string, :default => "http://127.0.0.1/cancel/"
-  preference :pmt_delayedpayreturn, :string, :default => "http://127.0.0.1/delayed/"
+  preference :okreturn, :string, :default => "http://127.0.0.1/"
+  preference :errorreturn, :string, :default => "http://127.0.0.1/404/"
+  preference :cancelreturn, :string, :default => "http://127.0.0.1/cancel/"
+  preference :delayedpayreturn, :string, :default => "http://127.0.0.1/delayed/"
   preference :secret, :string, :default => "11223344556677889900"
 
   #should be dynamic
@@ -315,6 +318,33 @@ class ExternalGateway < PaymentMethod
     return products
   end
 
+  def get_okreturn(order)
+    returner = self.preferences["okreturn"]
+    returner = returner + "/#{order.id}/";
+    return returner
+    #return "cake"
+  end
+  def get_errorreturn(order)
+    returner = self.preferences["errorreturn"]
+    returner = returner + "/#{order.id}/";
+    return returner
+    #return "bob"
+  end
+
+  def get_cancelreturn(order)
+    returner = self.preferences["cancelreturn"]
+    returner = returner + "/#{order.id}/";
+    return returner
+    #return "milk"
+  end
+
+  def get_delayedpayreturn(order)
+    returner = self.preferences["delayedpayreturn"]
+    returner = returner + "/#{order.id}/";
+    return returner
+    #return "fukufufkufu"
+  end
+
   def get_sellercosts(order)
     #return "0,00"
     return num_to_s(order.ship_total.round(2))
@@ -334,12 +364,18 @@ class ExternalGateway < PaymentMethod
     
     hashprimer = hashprimer + get_amount(order) + "&" unless get_amount(order).nil?
     
-
     hashprimer = hashprimer + self.preferences["pmt_currency"] + "&" unless self.preferences["pmt_currency"].nil?
-    hashprimer = hashprimer + self.preferences["pmt_okreturn"] + "&" unless self.preferences["pmt_okreturn"].nil?
-    hashprimer = hashprimer + self.preferences["pmt_errorreturn"] + "&" unless self.preferences["pmt_errorreturn"].nil?
-    hashprimer = hashprimer + self.preferences["pmt_cancelreturn"] + "&" unless self.preferences["pmt_cancelreturn"].nil?
-    hashprimer = hashprimer + self.preferences["pmt_delayedpayreturn"] + "&" unless self.preferences["pmt_delayedpayreturn"].nil?
+    
+    #hashprimer = hashprimer + self.preferences["pmt_okreturn"] + "&" unless self.preferences["pmt_okreturn"].nil?
+    #hashprimer = hashprimer + self.preferences["pmt_errorreturn"] + "&" unless self.preferences["pmt_errorreturn"].nil?
+    #hashprimer = hashprimer + self.preferences["pmt_cancelreturn"] + "&" unless self.preferences["pmt_cancelreturn"].nil?
+    #hashprimer = hashprimer + self.preferences["pmt_delayedpayreturn"] + "&" unless self.preferences["pmt_delayedpayreturn"].nil?
+    hashprimer = hashprimer + get_okreturn(order) + "&" unless get_okreturn(order).nil?
+    hashprimer = hashprimer + get_errorreturn(order) + "&" unless get_errorreturn(order).nil?
+    hashprimer = hashprimer + get_cancelreturn(order) + "&" unless get_cancelreturn(order).nil?
+    hashprimer = hashprimer + get_delayedpayreturn(order) + "&" unless get_delayedpayreturn(order).nil?
+    
+
     hashprimer = hashprimer + self.preferences["pmt_escrow"] + "&" unless self.preferences["pmt_escrow"].nil?
     hashprimer = hashprimer + self.preferences["pmt_escrowchangeallowed"] + "&" unless self.preferences["pmt_escrowchangeallowed"].nil?
     

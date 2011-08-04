@@ -32,7 +32,14 @@
 
       $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_hash, payment_method.get_hash(@order))) %>");
 
+      console.log("<%= payment_method.get_hash(@order) %>")
+
       $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_sellercosts, payment_method.get_sellercosts(@order))) %>");
+
+      $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_okreturn, payment_method.get_okreturn(@order))) %>");
+      $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_errorreturn, payment_method.get_errorreturn(@order))) %>");
+      $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_cancelreturn, payment_method.get_cancelreturn(@order))) %>");
+      $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_delayedpayreturn, payment_method.get_delayedpayreturn(@order))) %>");
 
       // loop through the billing and shipping address
 
@@ -50,8 +57,8 @@
       <% end %>
       
       <% payment_method.additional_attributes.each do |key, value| %>
-        //console.log("<%= key %>, <%= value %>")
-        $('form').append("<%= escape_javascript(hidden_field_tag(key.to_sym, value.to_s)) %>");
+        console.log("<%= "#{key} #{value}" unless (key=="pmt_delayedpayreturn" || key=="pmt_okreturn" || key=="pmt_errorreturn" || key=="pmt_cancelreturn" || key=="pmt_delayedpayreturn") %>")
+        $('form').append("<%= escape_javascript(hidden_field_tag(key.to_sym, value.to_s)) unless (key=="pmt_delayedpayreturn" || key=="pmt_okreturn" || key=="pmt_errorreturn" || key=="pmt_cancelreturn" || key=="pmt_delayedpayreturn") %>");
       <% end -%>
 
       <% # remove erb tags and hash to uncomment -> $('form input[type=submit], form button[type=submit]').removeAttr('disabled'); %>

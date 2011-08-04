@@ -12,7 +12,16 @@ module HostedGateway
         #of this is prone to messing up updates - maybe we could use alias_method_chain or something?
 
         def process_gateway_return
-          gateway = PaymentMethod.find_by_id_and_type(ExternalGateway.parse_custom_data(params)["payment_method_id"], "ExternalGateway")
+          puts "Diag data!"
+          puts ""
+          puts params
+          puts ""
+          puts ""
+          puts params["status"]
+
+
+          gateway = PaymentMethod.find_by_type_and_name("ExternalGateway", "Maksuturva")
+          #gateway = PaymentMethod.find_by_id_and_type()
           @order, payment_made = gateway.process_response(params)
 
           if @order && payment_made
