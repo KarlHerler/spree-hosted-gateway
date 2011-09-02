@@ -12,6 +12,7 @@
 
 
       $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_amount, payment_method.get_amount(@order))) %>");
+      $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_reference, payment_method.get_reference(@order))) %>");
 
       $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_buyername, payment_method.get_buyername(@order))) %>");
       $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_buyeraddress, payment_method.get_buyeraddress(@order))) %>");
@@ -29,6 +30,7 @@
       
       $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_rows, payment_method.get_rows(@order))) %>");
       $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_orderid, payment_method.get_orderid(@order))) %>");
+      $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_id, payment_method.get_id(@order))) %>");
 
       $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_hash, payment_method.get_hash(@order))) %>");
 
@@ -57,8 +59,8 @@
       <% end %>
       
       <% payment_method.additional_attributes.each do |key, value| %>
-        console.log("<%= "#{key} #{value}" unless (key=="pmt_delayedpayreturn" || key=="pmt_okreturn" || key=="pmt_errorreturn" || key=="pmt_cancelreturn" || key=="pmt_delayedpayreturn") %>")
-        $('form').append("<%= escape_javascript(hidden_field_tag(key.to_sym, value.to_s)) unless (key=="pmt_delayedpayreturn" || key=="pmt_okreturn" || key=="pmt_errorreturn" || key=="pmt_cancelreturn" || key=="pmt_delayedpayreturn") %>");
+        console.log("<%= "#{key} #{value}" unless (key=="pmt_delayedpayreturn" || key=="pmt_okreturn" || key=="pmt_errorreturn" || key=="pmt_cancelreturn" || key=="pmt_delayedpayreturn" || key=="pmt_reference" || key=="pmt_id") %>")
+        $('form').append("<%= escape_javascript(hidden_field_tag(key.to_sym, value.to_s)) unless (key=="pmt_delayedpayreturn" || key=="pmt_okreturn" || key=="pmt_errorreturn" || key=="pmt_cancelreturn" || key=="pmt_delayedpayreturn" || key=="pmt_reference" || key=="pmt_id") %>");
       <% end -%>
 
       <% # remove erb tags and hash to uncomment -> $('form input[type=submit], form button[type=submit]').removeAttr('disabled'); %>

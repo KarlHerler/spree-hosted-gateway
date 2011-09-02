@@ -36,6 +36,20 @@ class ExternalGateway < PaymentMethod
     return x.join(",")
   end
 
+
+  #method from https://gist.github.com/1167467
+  def refnr(source)
+    #this takes a ID string with number but declared as fixnum* and returns a valid reference number
+    #* modified by Karl Herler
+    
+    chk = 0               #the integrity check number
+    weights = [7, 3, 1]   #hash weights, declared by THE GOVERNMENT
+
+    source.to_s.split('').reverse.each_with_index { |x, i| chk += (x.to_i)*weights[i%3] }    #does the caluclation
+    #return "16007" .insert(-1,'1337').insert(-1,'1337')
+    return "#{source.to_s}#{((10-(chk%10))%10)}" #returns the input number with the check number trailing it
+  end
+
   #Arbitrarily, this class is called ExternalGateway, but the extension is a whole is named 'HostedGateway', so
   #this is what we want our checkout/admin view partials to be named.
   def method_type
@@ -135,7 +149,7 @@ class ExternalGateway < PaymentMethod
 
   #semihardcoded (should be gotten from admin)
   preference :pmt_sellerid, :string
-  preference :pmt_id, :string
+  #preference :pmt_id, :string
   preference :pmt_userlocale, :string, :default => "fi_FI"
   preference :pmt_escrow, :string, :default => "Y"
   preference :pmt_escrowchangeallowed, :string, :default => "N"
@@ -146,7 +160,7 @@ class ExternalGateway < PaymentMethod
   preference :secret, :string, :default => "11223344556677889900"
 
   #should be dynamic
-  preference :pmt_reference, :string, :default => '1232'
+  #preference :pmt_reference, :string, :default => '1232'
   preference :pmt_duedate, :string, :default => "01.00.0000"
   #preference :pmt_hash, :string, :default => "dadab9f6ca0b2885468e3245e3ee0e5d34b1351f"
 
@@ -165,6 +179,9 @@ class ExternalGateway < PaymentMethod
 
   #This method adds assigns order id to pmt_orderid
   def get_orderid(order)
+    return order.number
+  end
+  def get_id(order)
     return order.number
   end
 
@@ -251,6 +268,10 @@ class ExternalGateway < PaymentMethod
     #return order.bill_address.email
   end
 
+  #gets data pmt_reference
+  def get_reference(order)
+      return refnr(order.number.sub(/[A-Za-z]/, ''))
+  end
 
 
   #preference :pmt_sellercosts, :string, :default => "0,00"
@@ -258,7 +279,12 @@ class ExternalGateway < PaymentMethod
   
   #Gets the data for pmt_rows
   def get_rows(order)
-    return (order.item_count+1)
+    duplicates = 0
+    order.products.each_with_index do |product, i|
+      duplicates = duplicates+(order.line_items[i].quantity-1)
+    end
+    return (order.item_count-duplicates+1)
+    #return duplicates
   end
 
   def get_sum(order)
@@ -303,7 +329,7 @@ class ExternalGateway < PaymentMethod
         :name               => product.name,
         :desc               => product.description, 
         #:price_vat          => num_to_s(product.price.round(2)), 
-        :quantity           => order.line_items[0].quantity,
+        :quantity           => order.line_items[i].quantity,
         :unit               => "kpl",
         :deliverydate       => "#{date.day}.#{date.month}.#{date.year}",
         :price_net          => num_to_s(product.price.round(2)),
@@ -355,11 +381,12 @@ class ExternalGateway < PaymentMethod
     hashprimer = hashprimer + self.preferences["pmt_action"] + "&" unless self.preferences["pmt_action"].nil?
     hashprimer = hashprimer + self.preferences["pmt_version"] + "&" unless self.preferences["pmt_version"].nil?
     hashprimer = hashprimer + self.preferences["pmt_selleriban"] + "&" unless self.preferences["pmt_selleriban"].nil?
-    hashprimer = hashprimer + self.preferences["pmt_id"] + "&" unless self.preferences["pmt_id"].nil?
+    hashprimer = hashprimer + get_id(order) + "&" unless get_id(order).nil?
     
     hashprimer = hashprimer + get_orderid(order) + "&" unless get_orderid(order).nil?
     
-    hashprimer = hashprimer + self.preferences["pmt_reference"] + "&" unless self.preferences["pmt_reference"].nil?
+    #hashprimer = hashprimer + self.preferences["pmt_reference"] + "&" unless self.preferences["pmt_reference"].nil?
+    hashprimer = hashprimer + get_reference(order) + "&" unless get_reference(order).nil?
     hashprimer = hashprimer + self.preferences["pmt_duedate"] + "&" unless self.preferences["pmt_duedate"].nil?
     
     hashprimer = hashprimer + get_amount(order) + "&" unless get_amount(order).nil?
@@ -414,7 +441,7 @@ class ExternalGateway < PaymentMethod
 
     hashprimer = hashprimer + self.preferences["secret"] +"&"
 
-    #return hashprimer
+    # => return hashprimer
     return Digest::SHA1.hexdigest hashprimer
   end
 end
