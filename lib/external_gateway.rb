@@ -66,12 +66,12 @@ class ExternalGateway < PaymentMethod
      begin
        #return [nil, false]
        #Find order
-       order = Order.find_by_number(ExternalGateway.parse_custom_data(params)["id"])
-       puts "#{order}"
-       raise ActiveRecord::RecordNotFound if order.token != ExternalGateway.parse_custom_data(params)["order_token"]
+       order = Order.find_by_number(params["pmt_id"])
+       raise ActiveRecord::RecordNotFound if order.nil? #don't carry arround the token.
+       #raise ActiveRecord::RecordNotFound if order.token != ExternalGateway.parse_custom_data(params)["order_token"]
 
        #Check for successful response
-       transaction_succeeded = params[self.preferred_status_param_key.to_sym] == self.preferred_successful_transaction_value.to_s
+       transaction_succeeded = params["status"] == "success" # Aww yeah security.
        return [order, transaction_succeeded]
      rescue ActiveRecord::RecordNotFound
        #Return nil and false if we couldn't find the order - this is probably bad.

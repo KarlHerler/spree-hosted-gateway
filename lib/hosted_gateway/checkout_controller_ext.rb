@@ -12,12 +12,6 @@ module HostedGateway
         #of this is prone to messing up updates - maybe we could use alias_method_chain or something?
 
         def process_gateway_return
-          puts "Diag data!"
-          puts ""
-          puts params
-          puts ""
-          puts ""
-          puts params["status"]
 
 
           gateway = PaymentMethod.find_by_type_and_name("ExternalGateway", "Maksuturva")
@@ -40,7 +34,6 @@ module HostedGateway
 
             if @order.state == "complete" or @order.completed?
               flash[:notice] = I18n.t(:order_processed_successfully)
-              flash[:commerce_tracking] = "nothing special"
               redirect_to completion_route
             else
               redirect_to checkout_state_path(@order.state)
@@ -51,6 +44,9 @@ module HostedGateway
             redirect_to checkout_path
           else
             #Error processing payment
+
+            #the state we land in on faled.
+
             flash[:error] = I18n.t(:payment_processing_failed)
             redirect_to checkout_state_path(@order.state) and return
           end
