@@ -205,7 +205,8 @@ class ExternalGateway < PaymentMethod
   
   #gets data for pmt_buyeraddress
   def get_buyeraddress(order)
-    return order.bill_address.address1
+    coder = HTMLEntities.new
+    return coder.encode(order.bill_address.address1, :named)
   end
 
   #gets data for pmt_buyerpostalcode
@@ -215,7 +216,8 @@ class ExternalGateway < PaymentMethod
 
   #gets data for pmt_buyercity
   def get_buyercity(order)
-    return order.bill_address.city
+    coder = HTMLEntities.new
+    return coder.encode(order.bill_address.city, :named)
   end
 
   #gets data for pmt_buyercountry
@@ -240,12 +242,14 @@ class ExternalGateway < PaymentMethod
 
   #gets data for pmt_deliveryname
   def get_deliveryname(order)
-    return "#{order.ship_address.firstname} #{order.ship_address.lastname}"
+    coder = HTMLEntities.new
+    return coder.encode("#{order.ship_address.firstname} #{order.ship_address.lastname}", :named)
   end
 
   #gets data for pmt_deliveryaddress
   def get_deliveryaddress(order)
-    return order.ship_address.address1
+    coder = HTMLEntities.new
+    return coder.encode(order.ship_address.address1)
   end
 
   #gets data for pmt_deliverypostalcode
@@ -255,7 +259,8 @@ class ExternalGateway < PaymentMethod
 
   #gets data for pmt_deliverycity
   def get_deliverycity(order)
-    return order.ship_address.city
+    coder = HTMLEntities.new
+    return coder.encode(order.ship_address.city, :named)
   end
 
   #gets data for pmt_deliverycountry
