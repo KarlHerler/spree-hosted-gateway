@@ -28,7 +28,9 @@ class ExternalGateway < PaymentMethod
   #An array of preferences that should not be automatically inserted into the form
   INTERNAL_PREFERENCES = [:server, :status_param_key, :successful_transaction_value, :custom_data, :pmt_okreturn, :pmt_errorreturn]
 
-
+  def with_fire(s) 
+    return s.gsub(/å/,"a").gsub(/ä/."a").gsub(/ö/, "o")
+  end
   def num_to_s(param)
     x = param.to_s.split(".")
 
@@ -199,14 +201,16 @@ class ExternalGateway < PaymentMethod
   #gets data for pmt_buyername
   def get_buyername(order)
     coder = HTMLEntities.new
-    return coder.encode("#{order.bill_address.firstname} #{order.bill_address.lastname}", :named)
+   
+    return with_fire.encode("#{order.bill_address.firstname} #{order.bill_address.lastname}", :named)
+    #return "#{order.bill_address.firstname} #{order.bill_address.lastname}"
   end
 
   
   #gets data for pmt_buyeraddress
   def get_buyeraddress(order)
     coder = HTMLEntities.new
-    return coder.encode(order.bill_address.address1, :named)
+    return with_fire.encode(order.bill_address.address1, :named)
   end
 
   #gets data for pmt_buyerpostalcode
@@ -217,7 +221,7 @@ class ExternalGateway < PaymentMethod
   #gets data for pmt_buyercity
   def get_buyercity(order)
     coder = HTMLEntities.new
-    return coder.encode(order.bill_address.city, :named)
+    return with_fire.encode(order.bill_address.city, :named)
   end
 
   #gets data for pmt_buyercountry
@@ -243,13 +247,13 @@ class ExternalGateway < PaymentMethod
   #gets data for pmt_deliveryname
   def get_deliveryname(order)
     coder = HTMLEntities.new
-    return coder.encode("#{order.ship_address.firstname} #{order.ship_address.lastname}", :named)
+    return with_fire.encode("#{order.ship_address.firstname} #{order.ship_address.lastname}", :named)
   end
 
   #gets data for pmt_deliveryaddress
   def get_deliveryaddress(order)
     coder = HTMLEntities.new
-    return coder.encode(order.ship_address.address1)
+    return with_fire.encode(order.ship_address.address1)
   end
 
   #gets data for pmt_deliverypostalcode
@@ -260,7 +264,7 @@ class ExternalGateway < PaymentMethod
   #gets data for pmt_deliverycity
   def get_deliverycity(order)
     coder = HTMLEntities.new
-    return coder.encode(order.ship_address.city, :named)
+    return with_fire.encode(order.ship_address.city, :named)
   end
 
   #gets data for pmt_deliverycountry
@@ -440,16 +444,16 @@ class ExternalGateway < PaymentMethod
 
     get_products(order).each do |n|
       coder = HTMLEntities.new
-      hashprimer = hashprimer + coder.encode(n[:name], :named) + "&"
-      hashprimer = hashprimer + coder.encode(n[:desc], :named) + "&"
+      hashprimer = hashprimer + with_fire.encode(n[:name], :named) + "&"
+      hashprimer = hashprimer + with_fire.encode(n[:desc], :named) + "&"
       # hashprimer = hashprimer + n[:price_vat] + "&"
-      hashprimer = hashprimer + coder.encode(n[:quantity].to_s, :named) + "&"
-      hashprimer = hashprimer + coder.encode(n[:unit], :named) + "&"
-      hashprimer = hashprimer + coder.encode(n[:deliverydate], :named) + "&"
-      hashprimer = hashprimer + coder.encode(n[:price_net].to_s, :named) + "&"
-      hashprimer = hashprimer + coder.encode(n[:vat].to_s, :named) + "&"
-      hashprimer = hashprimer + coder.encode(n[:discountpercentage].to_s, :named) + "&"
-      hashprimer = hashprimer + coder.encode(n[:type].to_s, :named) + "&"
+      hashprimer = hashprimer + with_fire.encode(n[:quantity].to_s, :named) + "&"
+      hashprimer = hashprimer + with_fire.encode(n[:unit], :named) + "&"
+      hashprimer = hashprimer + with_fire.encode(n[:deliverydate], :named) + "&"
+      hashprimer = hashprimer + with_fire.encode(n[:price_net].to_s, :named) + "&"
+      hashprimer = hashprimer + with_fire.encode(n[:vat].to_s, :named) + "&"
+      hashprimer = hashprimer + with_fire.encode(n[:discountpercentage].to_s, :named) + "&"
+      hashprimer = hashprimer + with_fire.encode(n[:type].to_s, :named) + "&"
     end
 
     hashprimer = hashprimer + self.preferences["secret"] +"&"
