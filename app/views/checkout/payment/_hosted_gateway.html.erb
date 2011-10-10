@@ -1,3 +1,9 @@
+<%
+require 'htmlentities'
+require 'unicode'
+$KCODE = 'UTF-8'
+coder = HTMLEntities.new
+%>
 <% content_for :head do  -%>
   <%= stylesheet_link_tag 'payment' -%>
   <%= javascript_tag do -%>
@@ -19,14 +25,13 @@
       $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_buyerpostalcode, payment_method.get_buyerpostalcode(@order))) %>");
       $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_buyercity, payment_method.get_buyercity(@order))) %>");
       $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_buyercountry, payment_method.get_buyercountry(@order))) %>");
-
-
+      $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_buyeremail, payment_method.get_buyeremail(@order))) %>")
       $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_deliveryname, payment_method.get_deliveryname(@order))) %>");
       $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_deliveryaddress, payment_method.get_deliveryaddress(@order))) %>");
       $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_deliverypostalcode, payment_method.get_deliverypostalcode(@order))) %>");
       $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_deliverycity, payment_method.get_deliverycity(@order))) %>");
       $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_deliverycountry, payment_method.get_deliverycountry(@order))) %>");
-
+      $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_deliveryemail, payment_method.get_buyeremail(@order))) %>")
       
       $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_rows, payment_method.get_rows(@order))) %>");
       $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_orderid, payment_method.get_orderid(@order))) %>");
@@ -47,20 +52,20 @@
 
       <% payment_method.get_products(@order).each_with_index do |n,i| %>
         //$('form').append("<%= n %>, ")
-        $('form').append("<%= escape_javascript(hidden_field_tag("pmt_row_name#{(i+1)}", n[:name])) %>");
-        $('form').append("<%= escape_javascript(hidden_field_tag("pmt_row_desc#{(i+1)}", n[:desc])) %>");
-        $('form').append("<%= escape_javascript(hidden_field_tag("pmt_row_quantity#{(i+1)}", n[:quantity])) %>");
-        $('form').append("<%= escape_javascript(hidden_field_tag("pmt_row_unit#{(i+1)}", n[:unit])) %>");
-        $('form').append("<%= escape_javascript(hidden_field_tag("pmt_row_deliverydate#{(i+1)}", n[:deliverydate])) %>");
-        $('form').append("<%= escape_javascript(hidden_field_tag("pmt_row_price_net#{(i+1)}", n[:price_net])) %>");
-        $('form').append("<%= escape_javascript(hidden_field_tag("pmt_row_vat#{(i+1)}", n[:vat])) %>");
-        $('form').append("<%= escape_javascript(hidden_field_tag("pmt_row_discountpercentage#{(i+1)}", n[:discountpercentage])) %>");
-        $('form').append("<%= escape_javascript(hidden_field_tag("pmt_row_type#{(i+1)}", n[:type])) %>");
+        $('form').append("<%= escape_javascript(hidden_field_tag("pmt_row_name#{(i+1)}", coder.encode(n[:name], :named))) %>");
+        $('form').append("<%= escape_javascript(hidden_field_tag("pmt_row_desc#{(i+1)}", coder.encode(n[:desc], :named))) %>");
+        $('form').append("<%= escape_javascript(hidden_field_tag("pmt_row_quantity#{(i+1)}", coder.encode(n[:quantity], :named))) %>");
+        $('form').append("<%= escape_javascript(hidden_field_tag("pmt_row_unit#{(i+1)}", coder.encode(n[:unit], :named))) %>");
+        $('form').append("<%= escape_javascript(hidden_field_tag("pmt_row_deliverydate#{(i+1)}", coder.encode(n[:deliverydate], :named))) %>");
+        $('form').append("<%= escape_javascript(hidden_field_tag("pmt_row_price_net#{(i+1)}", coder.encode(n[:price_net], :named))) %>");
+        $('form').append("<%= escape_javascript(hidden_field_tag("pmt_row_vat#{(i+1)}", coder.encode(n[:vat], :named))) %>");
+        $('form').append("<%= escape_javascript(hidden_field_tag("pmt_row_discountpercentage#{(i+1)}", coder.encode(n[:discountpercentage], :named))) %>");
+        $('form').append("<%= escape_javascript(hidden_field_tag("pmt_row_type#{(i+1)}", coder.encode(n[:type], :named))) %>");
       <% end %>
       
       <% payment_method.additional_attributes.each do |key, value| %>
         console.log("<%= "#{key} #{value}" unless (key=="pmt_delayedpayreturn" || key=="pmt_okreturn" || key=="pmt_errorreturn" || key=="pmt_cancelreturn" || key=="pmt_delayedpayreturn" || key=="pmt_reference" || key=="pmt_id") %>")
-        $('form').append("<%= escape_javascript(hidden_field_tag(key.to_sym, value.to_s)) unless (key=="pmt_delayedpayreturn" || key=="pmt_okreturn" || key=="pmt_errorreturn" || key=="pmt_cancelreturn" || key=="pmt_delayedpayreturn" || key=="pmt_reference" || key=="pmt_id") %>");
+        $('form').append("<%= escape_javascript(hidden_field_tag(key.to_sym, coder.encode(value.to_s, :named))) unless (key=="pmt_deliveryemail" || key=="pmt_buyeremail" || key=="pmt_delayedpayreturn" || key=="pmt_okreturn" || key=="pmt_errorreturn" || key=="pmt_cancelreturn" || key=="pmt_delayedpayreturn" || key=="pmt_reference" || key=="pmt_id") %>");
       <% end -%>
 
       <% # remove erb tags and hash to uncomment -> $('form input[type=submit], form button[type=submit]').removeAttr('disabled'); %>

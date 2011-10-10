@@ -2,6 +2,11 @@ class ExternalGateway < PaymentMethod
 
   require 'digest/sha1'
   require 'date'
+  require 'htmlentities'
+  require 'unicode'
+  $KCODE = 'UTF-8'
+  coder = HTMLEntities.new
+
   #We need access to routes to correctly assemble a return url
  include ActionController::UrlWriter
 
@@ -193,7 +198,8 @@ class ExternalGateway < PaymentMethod
 
   #gets data for pmt_buyername
   def get_buyername(order)
-    return "#{order.bill_address.firstname} #{order.bill_address.lastname}"
+    coder = HTMLEntities.new
+    return coder.encode("#{order.bill_address.firstname} #{order.bill_address.lastname}", :named)
   end
 
   
@@ -227,7 +233,7 @@ class ExternalGateway < PaymentMethod
   #preference :pmt_deliveryemail, :string, :default => "hi@karlherler.com"
   def get_buyeremail(order)
     #return ""
-    return order.bill_address.email
+    return order.user.email
   end
 
 
@@ -413,7 +419,7 @@ class ExternalGateway < PaymentMethod
     hashprimer = hashprimer + get_buyerpostalcode(order) + "&" unless get_buyerpostalcode(order).nil?
     hashprimer = hashprimer + get_buyercity(order) + "&" unless get_buyercity(order).nil?
     hashprimer = hashprimer + get_buyercountry(order) + "&" unless get_buyercountry(order).nil?
-
+    #hashprimer = hashprimer + get_buyeremail(order) + "&" unless get_buyeremail(order).nil?
 
     hashprimer = hashprimer + get_deliveryname(order) + "&" unless get_deliveryname(order).nil?
     # hashprimer = hashprimer + params[k]+"&" if k=="pmt_paymentmethod"
@@ -422,26 +428,28 @@ class ExternalGateway < PaymentMethod
     hashprimer = hashprimer + get_deliverypostalcode(order) + "&" unless get_deliverypostalcode(order).nil?
     hashprimer = hashprimer + get_deliverycity(order) + "&" unless get_deliverycity(order).nil?
     hashprimer = hashprimer + get_deliverycountry(order) + "&" unless get_deliverycountry(order).nil?
-    
+    #hashprimer = hashprimer + get_buyeremail(order) + "&" unless get_buyeremail(order).nil?
+
     hashprimer = hashprimer + get_sellercosts(order) + "&" unless get_sellercosts(order).nil?
     
 
     get_products(order).each do |n|
-      hashprimer = hashprimer + n[:name] + "&"
-      hashprimer = hashprimer + n[:desc] + "&"
+      coder = HTMLEntities.new
+      hashprimer = hashprimer + coder.encode(n[:name], :named) + "&"
+      hashprimer = hashprimer + coder.encode(n[:desc], :named) + "&"
       # hashprimer = hashprimer + n[:price_vat] + "&"
-      hashprimer = hashprimer + n[:quantity].to_s + "&"
-      hashprimer = hashprimer + n[:unit] + "&"
-      hashprimer = hashprimer + n[:deliverydate] + "&"
-      hashprimer = hashprimer + n[:price_net].to_s + "&"
-      hashprimer = hashprimer + n[:vat].to_s + "&"
-      hashprimer = hashprimer + n[:discountpercentage].to_s + "&"
-      hashprimer = hashprimer + n[:type].to_s + "&"
+      hashprimer = hashprimer + coder.encode(n[:quantity].to_s, :named) + "&"
+      hashprimer = hashprimer + coder.encode(n[:unit], :named) + "&"
+      hashprimer = hashprimer + coder.encode(n[:deliverydate], :named) + "&"
+      hashprimer = hashprimer + coder.encode(n[:price_net].to_s, :named) + "&"
+      hashprimer = hashprimer + coder.encode(n[:vat].to_s, :named) + "&"
+      hashprimer = hashprimer + coder.encode(n[:discountpercentage].to_s, :named) + "&"
+      hashprimer = hashprimer + coder.encode(n[:type].to_s, :named) + "&"
     end
 
     hashprimer = hashprimer + self.preferences["secret"] +"&"
 
-    # => return hashprimer
+    #return hashprimer
     return Digest::SHA1.hexdigest hashprimer
   end
 end
