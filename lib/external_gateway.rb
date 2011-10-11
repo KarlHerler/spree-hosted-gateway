@@ -29,8 +29,10 @@ class ExternalGateway < PaymentMethod
   INTERNAL_PREFERENCES = [:server, :status_param_key, :successful_transaction_value, :custom_data, :pmt_okreturn, :pmt_errorreturn]
 
   def with_fire(s, param=:named)
-    return s.tr('åä', "a").tr('ö', "o") if s.class()=="asd".class()
-    return s
+    coder = HTMLEntities.new
+    return coder.encode(s)
+    #return s.tr('åä', "a").tr('ö', "o") if s.class()=="asd".class()
+    #return s
   end
   def num_to_s(param)
     x = param.to_s.split(".")
