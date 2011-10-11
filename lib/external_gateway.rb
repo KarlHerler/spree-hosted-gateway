@@ -461,8 +461,8 @@ class ExternalGateway < PaymentMethod
 
     hashprimer = hashprimer + self.preferences["secret"] +"&"
 
-    return hashprimer
-    #return Digest::SHA1.hexdigest hashprimer
+    #return hashprimer
+    return Digest::SHA1.hexdigest hashprimer
   end
 end
 
