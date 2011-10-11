@@ -40,8 +40,6 @@ coder = HTMLEntities.new
 
       $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_hash, payment_method.get_hash(@order))) %>");
 
-      console.log("<%= payment_method.get_hash(@order) %>")
-
       $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_sellercosts, payment_method.get_sellercosts(@order))) %>");
 
       $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_okreturn, payment_method.get_okreturn(@order))) %>");
