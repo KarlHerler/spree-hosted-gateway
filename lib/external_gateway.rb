@@ -28,7 +28,7 @@ class ExternalGateway < PaymentMethod
   #An array of preferences that should not be automatically inserted into the form
   INTERNAL_PREFERENCES = [:server, :status_param_key, :successful_transaction_value, :custom_data, :pmt_okreturn, :pmt_errorreturn]
 
-  def with_fire(s) 
+  def with_fire(s, param) 
     return s.tr('åä', "a").tr('ö', "o")
   end
   def num_to_s(param)
