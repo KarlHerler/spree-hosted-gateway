@@ -65,7 +65,6 @@ coder = HTMLEntities.new
       <% end %>
       
       <% payment_method.additional_attributes.each do |key, value| %>
-        console.log("<%= "#{key} #{value}" unless (key=="pmt_delayedpayreturn" || key=="pmt_okreturn" || key=="pmt_errorreturn" || key=="pmt_cancelreturn" || key=="pmt_delayedpayreturn" || key=="pmt_reference" || key=="pmt_id") %>")
         $('form').append("<%= escape_javascript(hidden_field_tag(key.to_sym, coder.encode(value.to_s, :named))) unless (key=="pmt_deliveryemail" || key=="pmt_buyeremail" || key=="pmt_delayedpayreturn" || key=="pmt_okreturn" || key=="pmt_errorreturn" || key=="pmt_cancelreturn" || key=="pmt_delayedpayreturn" || key=="pmt_reference" || key=="pmt_id") %>");
       <% end -%>
 
