@@ -53,15 +53,15 @@ coder = HTMLEntities.new
 
       <% payment_method.get_products(@order).each_with_index do |n,i| %>
         //$('form').append("<%= n %>, ")
-        $('form').append("<%= escape_javascript(hidden_field_tag("pmt_row_name#{(i+1)}", coder.encode(n[:name], :named))) %>");
-        $('form').append("<%= escape_javascript(hidden_field_tag("pmt_row_desc#{(i+1)}", coder.encode(n[:desc], :named))) %>");
-        $('form').append("<%= escape_javascript(hidden_field_tag("pmt_row_quantity#{(i+1)}", coder.encode(n[:quantity], :named))) %>");
-        $('form').append("<%= escape_javascript(hidden_field_tag("pmt_row_unit#{(i+1)}", coder.encode(n[:unit], :named))) %>");
-        $('form').append("<%= escape_javascript(hidden_field_tag("pmt_row_deliverydate#{(i+1)}", coder.encode(n[:deliverydate], :named))) %>");
-        $('form').append("<%= escape_javascript(hidden_field_tag("pmt_row_price_net#{(i+1)}", coder.encode(n[:price_net], :named))) %>");
-        $('form').append("<%= escape_javascript(hidden_field_tag("pmt_row_vat#{(i+1)}", coder.encode(n[:vat], :named))) %>");
-        $('form').append("<%= escape_javascript(hidden_field_tag("pmt_row_discountpercentage#{(i+1)}", coder.encode(n[:discountpercentage], :named))) %>");
-        $('form').append("<%= escape_javascript(hidden_field_tag("pmt_row_type#{(i+1)}", coder.encode(n[:type], :named))) %>");
+        $('form').append("<%= escape_javascript(hidden_field_tag("pmt_row_name#{(i+1)}", payment_method.with_fire(n[:name], :named))) %>");
+        $('form').append("<%= escape_javascript(hidden_field_tag("pmt_row_desc#{(i+1)}", payment_method.with_fire(n[:desc], :named))) %>");
+        $('form').append("<%= escape_javascript(hidden_field_tag("pmt_row_quantity#{(i+1)}", payment_method.with_fire(n[:quantity], :named))) %>");
+        $('form').append("<%= escape_javascript(hidden_field_tag("pmt_row_unit#{(i+1)}", payment_method.with_fire(n[:unit], :named))) %>");
+        $('form').append("<%= escape_javascript(hidden_field_tag("pmt_row_deliverydate#{(i+1)}", payment_method.with_fire(n[:deliverydate], :named))) %>");
+        $('form').append("<%= escape_javascript(hidden_field_tag("pmt_row_price_net#{(i+1)}", payment_method.with_fire(n[:price_net], :named))) %>");
+        $('form').append("<%= escape_javascript(hidden_field_tag("pmt_row_vat#{(i+1)}", payment_method.with_fire(n[:vat], :named))) %>");
+        $('form').append("<%= escape_javascript(hidden_field_tag("pmt_row_discountpercentage#{(i+1)}", payment_method.with_fire(n[:discountpercentage], :named))) %>");
+        $('form').append("<%= escape_javascript(hidden_field_tag("pmt_row_type#{(i+1)}", payment_method.with_fire(n[:type], :named))) %>");
       <% end %>
       
       <% payment_method.additional_attributes.each do |key, value| %>
