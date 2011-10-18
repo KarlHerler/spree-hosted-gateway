@@ -364,12 +364,19 @@ class ExternalGateway < PaymentMethod
 
   def get_okreturn(order)
     returner = self.preferences["okreturn"]
+    returner = returner.split(/\/fi/).join("/#{I18n.locale.to_s}")
+    returner = returner.split(/\/en/).join("/#{I18n.locale.to_s}")
+    returner = returner.split(/\/sv/).join("/#{I18n.locale.to_s}")
+    returner = Spree::Config.get(:site_url)
     returner = returner + "/#{order.id}/";
     return returner
     #return "cake"
   end
   def get_errorreturn(order)
     returner = self.preferences["errorreturn"]
+    returner = returner.split(/\/fi/).join("/#{I18n.locale.to_s}")
+    returner = returner.split(/\/en/).join("/#{I18n.locale.to_s}")
+    returner = returner.split(/\/sv/).join("/#{I18n.locale.to_s}")
     returner = returner + "/#{order.id}/";
     return returner
     #return "bob"
@@ -377,6 +384,9 @@ class ExternalGateway < PaymentMethod
 
   def get_cancelreturn(order)
     returner = self.preferences["cancelreturn"]
+    returner = returner.split(/\/fi/).join("/#{I18n.locale.to_s}")
+    returner = returner.split(/\/en/).join("/#{I18n.locale.to_s}")
+    returner = returner.split(/\/sv/).join("/#{I18n.locale.to_s}")
     returner = returner + "/#{order.id}/";
     return returner
     #return "milk"
@@ -384,6 +394,9 @@ class ExternalGateway < PaymentMethod
 
   def get_delayedpayreturn(order)
     returner = self.preferences["delayedpayreturn"]
+    returner = returner.split(/\/fi/).join("/#{I18n.locale.to_s}")
+    returner = returner.split(/\/en/).join("/#{I18n.locale.to_s}")
+    returner = returner.split(/\/sv/).join("/#{I18n.locale.to_s}")
     returner = returner + "/#{order.id}/";
     return returner
     #return "fukufufkufu"

@@ -43,9 +43,13 @@ coder = HTMLEntities.new
       $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_sellercosts, payment_method.get_sellercosts(@order))) %>");
 
       $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_okreturn, payment_method.get_okreturn(@order))) %>");
+      //$("form #pmt_okreturn").val().split('/en/en').join("/"+window.location.href.split("/")[3]).split('/fi/fi').join("/"+window.location.href.split("/")[3]).split('/sv/sv').join("/"+window.location.href.split("/")[3])
       $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_errorreturn, payment_method.get_errorreturn(@order))) %>");
+      //$("form #pmt_errorreturn").val().split('/en/en').join("/"+window.location.href.split("/")[3]).split('/fi/fi').join("/"+window.location.href.split("/")[3]).split('/sv/sv').join("/"+window.location.href.split("/")[3])
       $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_cancelreturn, payment_method.get_cancelreturn(@order))) %>");
+      //$("form #pmt_cancelreturn").val().split('/en/en').join("/"+window.location.href.split("/")[3]).split('/fi/fi').join("/"+window.location.href.split("/")[3]).split('/sv/sv').join("/"+window.location.href.split("/")[3])
       $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_delayedpayreturn, payment_method.get_delayedpayreturn(@order))) %>");
+      //$("form #pmt_delayedreturn").val().split('/en/en').join("/"+window.location.href.split("/")[3]).split('/fi/fi').join("/"+window.location.href.split("/")[3]).split('/sv/sv').join("/"+window.location.href.split("/")[3])
 
       // loop through the billing and shipping address
 
