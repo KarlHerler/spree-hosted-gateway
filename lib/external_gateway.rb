@@ -367,7 +367,6 @@ class ExternalGateway < PaymentMethod
     returner = returner.split(/\/fi/).join("/#{I18n.locale.to_s}")
     returner = returner.split(/\/en/).join("/#{I18n.locale.to_s}")
     returner = returner.split(/\/sv/).join("/#{I18n.locale.to_s}")
-    returner = Spree::Config.get(:site_url)
     returner = returner + "/#{order.id}/";
     return returner
     #return "cake"
