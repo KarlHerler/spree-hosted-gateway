@@ -242,7 +242,7 @@ class ExternalGateway < PaymentMethod
   #preference :pmt_deliveryemail, :string, :default => "hi@karlherler.com"
   def get_buyeremail(order)
     #return ""
-    return order.user.email
+    return order.email
   end
 
 
