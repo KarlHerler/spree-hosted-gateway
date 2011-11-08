@@ -47,6 +47,7 @@ class ExternalGateway < PaymentMethod
   end
 
 
+
   #method from https://gist.github.com/1167467
   def refnr(source)
     #this takes a ID string with number but declared as fixnum* and returns a valid reference number
@@ -144,6 +145,19 @@ class ExternalGateway < PaymentMethod
   end
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
   #Maksuturva specific methods added by: Karl Herler
 
   #hardcoded
@@ -178,14 +192,19 @@ class ExternalGateway < PaymentMethod
 
 
   
-  
+
+  ## MARK: Order metadata
 
   #added a generating method
   def get_maksuturva(order)
     get_hash(order)
-    #get_buyername(order)
-    #get_products(order)
   end
+
+  #gets data pmt_reference
+  def get_reference(order)
+      return refnr(order.number.sub(/[A-Za-z]/, ''))
+  end
+
 
   #This method adds assigns order id to pmt_orderid
   def get_orderid(order)
@@ -195,11 +214,52 @@ class ExternalGateway < PaymentMethod
     return order.number
   end
 
-  def get_amount(order)
-    #return "10,00"
-    return num_to_s((order.total-order.ship_total).round(2))
-    #order.total.round(2)
+  ## MARK: Order Return urls
+
+  def get_okreturn(order)
+    returner = self.preferences["okreturn"]
+    returner = returner.split(/\/fi/).join("/#{I18n.locale.to_s}")
+    returner = returner.split(/\/en/).join("/#{I18n.locale.to_s}")
+    returner = returner.split(/\/sv/).join("/#{I18n.locale.to_s}")
+    returner = returner + "/#{order.id}/";
+    return returner
+    #return "cake"
   end
+  def get_errorreturn(order)
+    returner = self.preferences["errorreturn"]
+    returner = returner.split(/\/fi/).join("/#{I18n.locale.to_s}")
+    returner = returner.split(/\/en/).join("/#{I18n.locale.to_s}")
+    returner = returner.split(/\/sv/).join("/#{I18n.locale.to_s}")
+    returner = returner + "/#{order.id}/";
+    return returner
+    #return "bob"
+  end
+
+  def get_cancelreturn(order)
+    returner = self.preferences["cancelreturn"]
+    returner = returner.split(/\/fi/).join("/#{I18n.locale.to_s}")
+    returner = returner.split(/\/en/).join("/#{I18n.locale.to_s}")
+    returner = returner.split(/\/sv/).join("/#{I18n.locale.to_s}")
+    returner = returner + "/#{order.id}/";
+    return returner
+    #return "milk"
+  end
+
+  def get_delayedpayreturn(order)
+    returner = self.preferences["delayedpayreturn"]
+    returner = returner.split(/\/fi/).join("/#{I18n.locale.to_s}")
+    returner = returner.split(/\/en/).join("/#{I18n.locale.to_s}")
+    returner = returner.split(/\/sv/).join("/#{I18n.locale.to_s}")
+    returner = returner + "/#{order.id}/";
+    return returner
+    #return "fukufufkufu"
+  end
+
+  ## END: Order metadata
+
+
+  ## MARK: Order User related
+
 
   #gets data for pmt_buyername
   def get_buyername(order)
@@ -238,10 +298,7 @@ class ExternalGateway < PaymentMethod
   end
 
   #gets data for pmt_buyeremail
-  #preference :pmt_buyeremail, :string, :default => "hi@karlherler.com"
-  #preference :pmt_deliveryemail, :string, :default => "hi@karlherler.com"
   def get_buyeremail(order)
-    #return ""
     return order.email
   end
 
@@ -286,15 +343,34 @@ class ExternalGateway < PaymentMethod
     #return order.bill_address.email
   end
 
-  #gets data pmt_reference
-  def get_reference(order)
-      return refnr(order.number.sub(/[A-Za-z]/, ''))
+
+  ## END: Order User related
+
+
+
+  ## MARK: TOTALS
+
+ def get_sum(order)
+    return ""
   end
 
+   def get_amount(order)
+    return num_to_s((order.total-order.ship_total).round(2))
+  end
 
-  #preference :pmt_sellercosts, :string, :default => "0,00"
+  def get_sellercosts(order)
+    #return "0,00"
+    return num_to_s(order.ship_total+0.01) if ((order.total-order.ship_total).round(2)-(order.total-order.ship_total))>0
+    return num_to_s(order.ship_total)
+  end
+
+  ## END: TOTALS
+
+
 
   
+  ## MARK: Basket Items
+
   #Gets the data for pmt_rows
   def get_rows(order)
     duplicates = 0
@@ -305,19 +381,6 @@ class ExternalGateway < PaymentMethod
     #return duplicates
   end
 
-  def get_sum(order)
-    return ""
-  end
-
-
-  # preference :pmt_row_name1, :string, :default => "Hat"
-  # preference :pmt_row_desc1, :string, :default => "A hat with three(3) corners."
-  # preference :pmt_row_quantity1, :string, :default => "1"
-  # preference :pmt_row_unit1, :string, :default => "kpl"
-  # preference :pmt_row_deliverydate1, :string, :default => "14.06.2011"
-  # preference :pmt_row_price_net1, :string, :default => "10"
-  # preference :pmt_row_vat1, :string, :default => "0,00"
-  # preference :pmt_row_type1, :string, :default => "1"
 
   def add_shipping(order)
     date = DateTime.now
@@ -362,50 +425,13 @@ class ExternalGateway < PaymentMethod
     return products
   end
 
-  def get_okreturn(order)
-    returner = self.preferences["okreturn"]
-    returner = returner.split(/\/fi/).join("/#{I18n.locale.to_s}")
-    returner = returner.split(/\/en/).join("/#{I18n.locale.to_s}")
-    returner = returner.split(/\/sv/).join("/#{I18n.locale.to_s}")
-    returner = returner + "/#{order.id}/";
-    return returner
-    #return "cake"
-  end
-  def get_errorreturn(order)
-    returner = self.preferences["errorreturn"]
-    returner = returner.split(/\/fi/).join("/#{I18n.locale.to_s}")
-    returner = returner.split(/\/en/).join("/#{I18n.locale.to_s}")
-    returner = returner.split(/\/sv/).join("/#{I18n.locale.to_s}")
-    returner = returner + "/#{order.id}/";
-    return returner
-    #return "bob"
-  end
 
-  def get_cancelreturn(order)
-    returner = self.preferences["cancelreturn"]
-    returner = returner.split(/\/fi/).join("/#{I18n.locale.to_s}")
-    returner = returner.split(/\/en/).join("/#{I18n.locale.to_s}")
-    returner = returner.split(/\/sv/).join("/#{I18n.locale.to_s}")
-    returner = returner + "/#{order.id}/";
-    return returner
-    #return "milk"
-  end
+  ## END: Basket Items
 
-  def get_delayedpayreturn(order)
-    returner = self.preferences["delayedpayreturn"]
-    returner = returner.split(/\/fi/).join("/#{I18n.locale.to_s}")
-    returner = returner.split(/\/en/).join("/#{I18n.locale.to_s}")
-    returner = returner.split(/\/sv/).join("/#{I18n.locale.to_s}")
-    returner = returner + "/#{order.id}/";
-    return returner
-    #return "fukufufkufu"
-  end
 
-  def get_sellercosts(order)
-    #return "0,00"
-    return num_to_s(order.ship_total+0.01) if ((order.total-order.ship_total).round(2)-(order.total-order.ship_total))>0
-    return num_to_s(order.ship_total)
-  end
+  
+
+
 
   def get_hash(order)
     hashprimer = ""
