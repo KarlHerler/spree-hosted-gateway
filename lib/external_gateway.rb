@@ -353,7 +353,12 @@ class ExternalGateway < PaymentMethod
   end
 
    def get_amount(order)
-    return num_to_s(order.products.map{ |x| (x.price*(1+x.tax_category.tax_rates[0].amount)).round(2) }.inject(:+).to_s)
+    li = order.line_items.map{ |x| x.quantity; }
+    p = order.products.map{ |x| (x.price*(1+x.tax_category.tax_rates[0].amount)).round(2) }
+    for i in 0..p.length-1 do
+      p[i] = p[i]*li[i]
+    end
+    return num_to_s(p.inject(:+).to_s)
     #return num_to_s((order.total-order.ship_total).round(2))
   end
 
