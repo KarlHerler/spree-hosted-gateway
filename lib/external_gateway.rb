@@ -191,6 +191,8 @@ class ExternalGateway < PaymentMethod
   #preference :pmt_amount, :string, :default => "10,00"
 
 
+
+
   
 
   ## MARK: Order metadata
@@ -223,7 +225,6 @@ class ExternalGateway < PaymentMethod
     returner = returner.split(/\/sv/).join("/#{I18n.locale.to_s}")
     returner = returner + "/#{order.id}/";
     return returner
-    #return "cake"
   end
   def get_errorreturn(order)
     returner = self.preferences["errorreturn"]
@@ -232,7 +233,6 @@ class ExternalGateway < PaymentMethod
     returner = returner.split(/\/sv/).join("/#{I18n.locale.to_s}")
     returner = returner + "/#{order.id}/";
     return returner
-    #return "bob"
   end
 
   def get_cancelreturn(order)
@@ -242,7 +242,6 @@ class ExternalGateway < PaymentMethod
     returner = returner.split(/\/sv/).join("/#{I18n.locale.to_s}")
     returner = returner + "/#{order.id}/";
     return returner
-    #return "milk"
   end
 
   def get_delayedpayreturn(order)
@@ -252,7 +251,6 @@ class ExternalGateway < PaymentMethod
     returner = returner.split(/\/sv/).join("/#{I18n.locale.to_s}")
     returner = returner + "/#{order.id}/";
     return returner
-    #return "fukufufkufu"
   end
 
   ## END: Order metadata
@@ -429,7 +427,7 @@ class ExternalGateway < PaymentMethod
   ## END: Basket Items
 
 
-  
+
 
 
 
