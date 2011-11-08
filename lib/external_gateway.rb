@@ -329,7 +329,7 @@ class ExternalGateway < PaymentMethod
       :quantity           => "1",
       :unit               => "kpl",
       :deliverydate       => "#{date.day}.#{date.month}.#{date.year}",
-      :price_net          => num_to_s((((order.ship_total*100).floor()).to_f)/100),
+      :price_net          => num_to_s(order.ship_total+((order.total-order.ship_total).round(2)-(order.total-order.ship_total))),
       :vat                => "0,00",
       :discountpercentage => "0,00",
       :type => "2"
@@ -403,7 +403,7 @@ class ExternalGateway < PaymentMethod
 
   def get_sellercosts(order)
     #return "0,00"
-    return num_to_s(order.ship_total.round(2))
+    return num_to_s(order.ship_total+((order.total-order.ship_total).round(2)-(order.total-order.ship_total)))
   end
 
   def get_hash(order)
