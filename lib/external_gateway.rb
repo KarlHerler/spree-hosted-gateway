@@ -353,12 +353,11 @@ class ExternalGateway < PaymentMethod
   end
 
    def get_amount(order)
-    return num_to_s((order.total-order.ship_total).round(2))
+    return num_to_s(order.products.map{ |x| (x.price*(1+x.tax_category.tax_rates[0].amount)).round(2) }.inject(:+).to_s)
+    #return num_to_s((order.total-order.ship_total).round(2))
   end
 
   def get_sellercosts(order)
-    #return "0,00"
-    return num_to_s(order.ship_total+0.01) if ((order.total-order.ship_total).round(2)-(order.total-order.ship_total))>0
     return num_to_s(order.ship_total)
   end
 
@@ -411,8 +410,9 @@ class ExternalGateway < PaymentMethod
         :quantity           => order.line_items[i].quantity,
         :unit               => "kpl",
         :deliverydate       => "#{date.day}.#{date.month}.#{date.year}",
-        :price_net          => num_to_s(product.price.round(2)),
-        :vat                => num_to_s(product.tax_category.tax_rates[0].amount*100),
+        :price_net          => num_to_s((product.price*(1+product.tax_category.tax_rates[0].amount)).round(2)),
+        #:vat                => num_to_s(product.tax_category.tax_rates[0].amount*100),
+        :vat                => "0,00",
         :discountpercentage => "0,00",
         :type => "1"
       }
