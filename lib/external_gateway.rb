@@ -409,8 +409,8 @@ class ExternalGateway < PaymentMethod
     
     order.products.each_with_index do |product, i|
       products[i] = {
-        :name               => product.name,
-        :desc               => product.description, 
+        :name               => with_fire(product.name),
+        :desc               => with_fire(product.description), 
         #:price_vat          => num_to_s(product.price.round(2)), 
         :quantity           => order.line_items[i].quantity,
         :unit               => "kpl",
@@ -489,8 +489,8 @@ class ExternalGateway < PaymentMethod
 
     get_products(order).each do |n|
       coder = HTMLEntities.new
-      hashprimer = hashprimer + with_fire(n[:name], :named) + "&"
-      hashprimer = hashprimer + with_fire(n[:desc], :named) + "&"
+      hashprimer = hashprimer + n[:name], :named + "&"
+      hashprimer = hashprimer + n[:desc], :named + "&"
       # hashprimer = hashprimer + n[:price_vat] + "&"
       hashprimer = hashprimer + with_fire(n[:quantity].to_s, :named) + "&"
       hashprimer = hashprimer + with_fire(n[:unit], :named) + "&"
