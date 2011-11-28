@@ -354,7 +354,7 @@ class ExternalGateway < PaymentMethod
 
    def get_amount(order)
     li = order.line_items.map{ |x| x.quantity; }
-    p = order.products.map{ |x| (x.price*(1+x.tax_category.tax_rates[0].amount)).round(2) }
+    p = order.products.map{ |x| (x.price).round(2) }
     for i in 0..p.length-1 do
       p[i] = p[i]*li[i]
     end
@@ -415,7 +415,7 @@ class ExternalGateway < PaymentMethod
         :quantity           => order.line_items[i].quantity,
         :unit               => "kpl",
         :deliverydate       => "#{date.day}.#{date.month}.#{date.year}",
-        :price_net          => num_to_s((product.price*(1+product.tax_category.tax_rates[0].amount)).round(2)),
+        :price_net          => num_to_s(product.price).round(2)),
         #:vat                => num_to_s(product.tax_category.tax_rates[0].amount*100),
         :vat                => "0,00",
         :discountpercentage => "0,00",
