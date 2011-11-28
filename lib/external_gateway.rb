@@ -353,12 +353,16 @@ class ExternalGateway < PaymentMethod
   end
 
    def get_amount(order)
-    return num_to_s((order.total-order.ship_total).round(2))
+    li = order.line_items.map{ |x| x.quantity; }
+    p = order.products.map{ |x| (x.price*(1+x.tax_category.tax_rates[0].amount)).round(2) }
+    for i in 0..p.length-1 do
+      p[i] = p[i]*li[i]
+    end
+    return num_to_s(p.inject(:+).to_s)
+    #return num_to_s((order.total-order.ship_total).round(2))
   end
 
   def get_sellercosts(order)
-    #return "0,00"
-    return num_to_s(order.ship_total+0.01) if ((order.total-order.ship_total).round(2)-(order.total-order.ship_total))>0
     return num_to_s(order.ship_total)
   end
 
@@ -405,14 +409,15 @@ class ExternalGateway < PaymentMethod
     
     order.products.each_with_index do |product, i|
       products[i] = {
-        :name               => product.name,
-        :desc               => product.description, 
+        :name               => with_fire(product.name),
+        :desc               => with_fire(product.description), 
         #:price_vat          => num_to_s(product.price.round(2)), 
         :quantity           => order.line_items[i].quantity,
         :unit               => "kpl",
         :deliverydate       => "#{date.day}.#{date.month}.#{date.year}",
-        :price_net          => num_to_s(product.price.round(2)),
-        :vat                => num_to_s(product.tax_category.tax_rates[0].amount*100),
+        :price_net          => num_to_s((product.price*(1+product.tax_category.tax_rates[0].amount)).round(2)),
+        #:vat                => num_to_s(product.tax_category.tax_rates[0].amount*100),
+        :vat                => "0,00",
         :discountpercentage => "0,00",
         :type => "1"
       }
@@ -484,8 +489,8 @@ class ExternalGateway < PaymentMethod
 
     get_products(order).each do |n|
       coder = HTMLEntities.new
-      hashprimer = hashprimer + with_fire(n[:name], :named) + "&"
-      hashprimer = hashprimer + with_fire(n[:desc], :named) + "&"
+      hashprimer = hashprimer + n[:name], :named + "&"
+      hashprimer = hashprimer + n[:desc], :named + "&"
       # hashprimer = hashprimer + n[:price_vat] + "&"
       hashprimer = hashprimer + with_fire(n[:quantity].to_s, :named) + "&"
       hashprimer = hashprimer + with_fire(n[:unit], :named) + "&"
