@@ -1,0 +1,82 @@
+<%
+# encoding: UTF-8  
+require 'htmlentities'
+require 'unicode'
+$KCODE = 'UTF-8'
+coder = HTMLEntities.new
+%>
+<% content_for :head do  -%>
+  <%= stylesheet_link_tag 'payment' -%>
+  <%= javascript_tag do -%>
+    jQuery(document).ready(function()
+    {
+      <% #First, disable all the existing form inputs -%>
+      <% # remove erb tags and hash to uncomment -> $('form :input').attr('disabled', false); %>
+      <% #Next, change where the form is pointing to -%>
+      $('form[id=checkout_form_payment]').attr('action', '<%= escape_javascript(payment_method.get_server) %>');
+      $('form').attr('method', 'post');
+      $('form').attr('accept-charset', 'ISO-8859-1');
+
+
+      $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_amount, payment_method.get_amount(@order))) %>");
+      $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_reference, payment_method.get_reference(@order))) %>");
+
+      $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_buyername, payment_method.get_buyername(@order))) %>");
+      $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_buyeraddress, payment_method.get_buyeraddress(@order))) %>");
+      $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_buyerpostalcode, payment_method.get_buyerpostalcode(@order))) %>");
+      $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_buyercity, payment_method.get_buyercity(@order))) %>");
+      $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_buyercountry, payment_method.get_buyercountry(@order))) %>");
+      $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_buyeremail, payment_method.get_buyeremail(@order))) %>")
+      $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_deliveryname, payment_method.get_deliveryname(@order))) %>");
+      $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_deliveryaddress, payment_method.get_deliveryaddress(@order))) %>");
+      $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_deliverypostalcode, payment_method.get_deliverypostalcode(@order))) %>");
+      $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_deliverycity, payment_method.get_deliverycity(@order))) %>");
+      $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_deliverycountry, payment_method.get_deliverycountry(@order))) %>");
+      $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_deliveryemail, payment_method.get_buyeremail(@order))) %>")
+      
+      $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_rows, payment_method.get_rows(@order))) %>");
+      $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_orderid, payment_method.get_orderid(@order))) %>");
+      $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_id, payment_method.get_id(@order))) %>");
+
+      $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_hash, payment_method.get_hash(@order))) %>");
+
+      $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_sellercosts, payment_method.get_sellercosts(@order))) %>");
+
+      $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_okreturn, payment_method.get_okreturn(@order))) %>");
+      //$("form #pmt_okreturn").val().split('/en/en').join("/"+window.location.href.split("/")[3]).split('/fi/fi').join("/"+window.location.href.split("/")[3]).split('/sv/sv').join("/"+window.location.href.split("/")[3])
+      $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_errorreturn, payment_method.get_errorreturn(@order))) %>");
+      //$("form #pmt_errorreturn").val().split('/en/en').join("/"+window.location.href.split("/")[3]).split('/fi/fi').join("/"+window.location.href.split("/")[3]).split('/sv/sv').join("/"+window.location.href.split("/")[3])
+      $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_cancelreturn, payment_method.get_cancelreturn(@order))) %>");
+      //$("form #pmt_cancelreturn").val().split('/en/en').join("/"+window.location.href.split("/")[3]).split('/fi/fi').join("/"+window.location.href.split("/")[3]).split('/sv/sv').join("/"+window.location.href.split("/")[3])
+      $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_delayedpayreturn, payment_method.get_delayedpayreturn(@order))) %>");
+      //$("form #pmt_delayedreturn").val().split('/en/en').join("/"+window.location.href.split("/")[3]).split('/fi/fi').join("/"+window.location.href.split("/")[3]).split('/sv/sv').join("/"+window.location.href.split("/")[3])
+
+      // loop through the billing and shipping address
+
+      <% payment_method.get_products(@order).each_with_index do |n,i| %>
+        //$('form').append("<%= n %>, ")
+        $('form').append("<%= escape_javascript(hidden_field_tag("pmt_row_name#{(i+1)}", payment_method.with_fire(n[:name], :named))) %>");
+        $('form').append("<%= escape_javascript(hidden_field_tag("pmt_row_desc#{(i+1)}", payment_method.with_fire(n[:desc], :named))) %>");
+        $('form').append("<%= escape_javascript(hidden_field_tag("pmt_row_quantity#{(i+1)}", payment_method.with_fire(n[:quantity], :named))) %>");
+        $('form').append("<%= escape_javascript(hidden_field_tag("pmt_row_unit#{(i+1)}", payment_method.with_fire(n[:unit], :named))) %>");
+        $('form').append("<%= escape_javascript(hidden_field_tag("pmt_row_deliverydate#{(i+1)}", payment_method.with_fire(n[:deliverydate], :named))) %>");
+        $('form').append("<%= escape_javascript(hidden_field_tag("pmt_row_price_net#{(i+1)}", payment_method.with_fire(n[:price_net], :named))) %>");
+        $('form').append("<%= escape_javascript(hidden_field_tag("pmt_row_vat#{(i+1)}", payment_method.with_fire(n[:vat], :named))) %>");
+        $('form').append("<%= escape_javascript(hidden_field_tag("pmt_row_discountpercentage#{(i+1)}", payment_method.with_fire(n[:discountpercentage], :named))) %>");
+        $('form').append("<%= escape_javascript(hidden_field_tag("pmt_row_type#{(i+1)}", payment_method.with_fire(n[:type], :named))) %>");
+      <% end %>
+      
+      <% payment_method.additional_attributes.each do |key, value| %>
+        $('form').append("<%= escape_javascript(hidden_field_tag(key.to_sym, coder.encode(value.to_s, :named))) unless (key=="pmt_deliveryemail" || key=="pmt_buyeremail" || key=="pmt_delayedpayreturn" || key=="pmt_okreturn" || key=="pmt_errorreturn" || key=="pmt_cancelreturn" || key=="pmt_delayedpayreturn" || key=="pmt_reference" || key=="pmt_id") %>");
+      <% end -%>
+
+      <% # remove erb tags and hash to uncomment -> $('form input[type=submit], form button[type=submit]').removeAttr('disabled'); %>
+      $('form input[class=continue button primary]').val("<%= I18n.translate('external_gateway.checkout.button_text') %>");
+    });
+  <% end -%>
+<% end -%>
+
+<div class="external_gateway redirect_notice">
+  <%= image_tag 'proceed.png', :size => '48x48' -%>
+  <%= I18n.translate('external_gateway.checkout.redirect_notice') %>
+</div>
