@@ -28,12 +28,21 @@ class ExternalGateway < PaymentMethod
   #An array of preferences that should not be automatically inserted into the form
   INTERNAL_PREFERENCES = [:server, :status_param_key, :successful_transaction_value, :custom_data, :pmt_okreturn, :pmt_errorreturn]
 
+
+
+
+  ##MARK: Helper methods
+
+  # This is method used for escaping things, it is basically a decorator, in the
+  # sense that it can be replaced with anything in order to decorate the output
+  # of this class.
   def with_fire(s, param=:named)
-    coder = HTMLEntities.new
-    return coder.encode(s)
-    #return s.tr('åä', "a").tr('ö', "o") if s.class()=="asd".class()
+    #coder = HTMLEntities.new
+    #return coder.encode(s)
+    return s.tr('åä', "a").tr('ö', "o") if s.class()=="asd".class()
     #return s
   end
+
   def num_to_s(param)
     x = param.to_s.split(".")
 
@@ -45,7 +54,6 @@ class ExternalGateway < PaymentMethod
 
     return x.join(",")
   end
-
 
 
   #method from https://gist.github.com/1167467
@@ -60,6 +68,16 @@ class ExternalGateway < PaymentMethod
     #return "16007" .insert(-1,'1337').insert(-1,'1337')
     return "#{source.to_s}#{((10-(chk%10))%10)}" #returns the input number with the check number trailing it
   end
+
+
+
+
+
+
+
+
+
+  
 
   #Arbitrarily, this class is called ExternalGateway, but the extension is a whole is named 'HostedGateway', so
   #this is what we want our checkout/admin view partials to be named.
