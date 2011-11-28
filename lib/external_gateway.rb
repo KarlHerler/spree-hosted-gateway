@@ -415,7 +415,7 @@ class ExternalGateway < PaymentMethod
         :quantity           => order.line_items[i].quantity,
         :unit               => "kpl",
         :deliverydate       => "#{date.day}.#{date.month}.#{date.year}",
-        :price_net          => num_to_s(product.price).round(2),
+        :price_net          => num_to_s((product.price).round(2)),
         #:vat                => num_to_s(product.tax_category.tax_rates[0].amount*100),
         :vat                => "0,00",
         :discountpercentage => "0,00",
