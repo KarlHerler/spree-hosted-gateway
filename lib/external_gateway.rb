@@ -30,8 +30,8 @@ class ExternalGateway < PaymentMethod
 
   def with_fire(s, param=:named)
     coder = HTMLEntities.new
-    return coder.encode(s)
-    #return s.tr('åä', "a").tr('ö', "o") if s.class()=="asd".class()
+    s = coder.encode(s)
+    return s.tr('å', "&aring;").tr('ä', '&auml;').tr('ö', "&ouml;") if s.class()=="asd".class()
     #return s
   end
   def num_to_s(param)
@@ -358,6 +358,7 @@ class ExternalGateway < PaymentMethod
     for i in 0..p.length-1 do
       p[i] = p[i]*li[i]
     end
+    #return num_to_s(1.0)
     return num_to_s(p.inject(:+).to_s)
     #return num_to_s((order.total-order.ship_total).round(2))
   end
@@ -489,8 +490,8 @@ class ExternalGateway < PaymentMethod
 
     get_products(order).each do |n|
       coder = HTMLEntities.new
-      hashprimer = hashprimer + n[:name], :named + "&"
-      hashprimer = hashprimer + n[:desc], :named + "&"
+      hashprimer = hashprimer + with_fire(n[:name], :named) + "&"
+      hashprimer = hashprimer + with_fire(n[:desc], :named) + "&"
       # hashprimer = hashprimer + n[:price_vat] + "&"
       hashprimer = hashprimer + with_fire(n[:quantity].to_s, :named) + "&"
       hashprimer = hashprimer + with_fire(n[:unit], :named) + "&"
