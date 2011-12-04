@@ -31,8 +31,8 @@ class ExternalGateway < PaymentMethod
   def with_fire(s, param=:named)
     coder = HTMLEntities.new
     s = coder.encode(s)
-    s =  s.gsub(/å/, "&aring;").gsub(/ä/, '&auml;').gsub(/ö/, "&ouml;") if s.class()=="asd".class()
-    return s.gsub(/Å/, "&Aring;").gsub(/Ä/, '&Auml;').gsub(/Ö/, "&Ouml;") if s.class()=="asd".class()
+    #s =  s.gsub(/å/, "&aring;").gsub(/ä/, '&auml;').gsub(/ö/, "&ouml;") if s.class()=="asd".class()
+    #return s.gsub(/Å/, "&Aring;").gsub(/Ä/, '&Auml;').gsub(/Ö/, "&Ouml;") if s.class()=="asd".class()
     return s
   end
   def num_to_s(param)
@@ -165,8 +165,8 @@ class ExternalGateway < PaymentMethod
   preference :pmt_action, :string, :default => 'NEW_PAYMENT_EXTENDED'
   preference :pmt_version, :string, :default => '0004'
   preference :pmt_currency, :string, :default => "EUR"
-  preference :pmt_charset, :string, :default => "ISO-8859-1"
-  preference :pmt_charsethttp, :string, :default => "ISO-8859-1"
+  preference :pmt_charset, :string, :default => "UTF-8"
+  preference :pmt_charsethttp, :string, :default => "UTF-8"
   preference :pmt_hashversion, :string, :default => "SHA-1"
   preference :pmt_keygeneration, :string, :default => "001"
 
