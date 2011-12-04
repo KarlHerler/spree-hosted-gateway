@@ -287,7 +287,7 @@ class ExternalGateway < PaymentMethod
 
   #gets data for pmt_buyercountry
   def get_buyercountry(order)
-    return order.bill_address.country.to_s.slice(0, 2).upcase
+    return with_fire(order.bill_address.country.to_s.slice(0, 2).upcase, :named)
   end
 
   #gets data for pmt_buyerphone
@@ -311,7 +311,7 @@ class ExternalGateway < PaymentMethod
   #gets data for pmt_deliveryaddress
   def get_deliveryaddress(order)
     coder = HTMLEntities.new
-    return with_fire(order.ship_address.address1)
+    return with_fire(order.ship_address.address1, :named)
   end
 
   #gets data for pmt_deliverypostalcode
