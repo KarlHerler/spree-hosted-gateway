@@ -31,8 +31,8 @@ class ExternalGateway < PaymentMethod
   def with_fire(s, param=:named)
     coder = HTMLEntities.new
     s = coder.encode(s)
-    #s =  s.tr('å', "&aring;").tr('ä', '&auml;').tr('ö', "&ouml;") if s.class()=="asd".class()
-    #return s.tr('Å', "&Aring;").tr('Ä', '&Auml;').tr('Ö', "&Ouml;") if s.class()=="asd".class()
+    s =  s.gsub(/å/, "&aring;").gsub(/ä/, '&auml;').gsub(/ö/, "&ouml;") if s.class()=="asd".class()
+    return s.gsub(/Å/, "&Aring;").gsub(/Ä/, '&Auml;').gsub(/Ö/, "&Ouml;") if s.class()=="asd".class()
     return s
   end
   def num_to_s(param)
