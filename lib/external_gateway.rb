@@ -490,16 +490,16 @@ class ExternalGateway < PaymentMethod
 
     get_products(order).each do |n|
       coder = HTMLEntities.new
-      hashprimer = hashprimer + with_fire(n[:name], :named) + "&"
-      hashprimer = hashprimer + with_fire(n[:desc], :named) + "&"
+      hashprimer = hashprimer + n[:name] + "&"
+      hashprimer = hashprimer + n[:desc] + "&"
       # hashprimer = hashprimer + n[:price_vat] + "&"
-      hashprimer = hashprimer + with_fire(n[:quantity].to_s, :named) + "&"
-      hashprimer = hashprimer + with_fire(n[:unit], :named) + "&"
-      hashprimer = hashprimer + with_fire(n[:deliverydate], :named) + "&"
-      hashprimer = hashprimer + with_fire(n[:price_net].to_s, :named) + "&"
-      hashprimer = hashprimer + with_fire(n[:vat].to_s, :named) + "&"
-      hashprimer = hashprimer + with_fire(n[:discountpercentage].to_s, :named) + "&"
-      hashprimer = hashprimer + with_fire(n[:type].to_s, :named) + "&"
+      hashprimer = hashprimer + n[:quantity].to_s + "&"
+      hashprimer = hashprimer + n[:unit] + "&"
+      hashprimer = hashprimer + n[:deliverydate] + "&"
+      hashprimer = hashprimer + n[:price_net].to_s + "&"
+      hashprimer = hashprimer + n[:vat].to_s + "&"
+      hashprimer = hashprimer + n[:discountpercentage].to_s + "&"
+      hashprimer = hashprimer + n[:type].to_s + "&"
     end
 
     hashprimer = hashprimer + self.preferences["secret"] +"&"
