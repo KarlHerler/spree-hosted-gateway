@@ -33,7 +33,7 @@ class ExternalGateway < PaymentMethod
     s = coder.encode(s)
     #s =  s.gsub(/å/, "&aring;").gsub(/ä/, '&auml;').gsub(/ö/, "&ouml;") if s.class()=="asd".class()
     #return s.gsub(/Å/, "&Aring;").gsub(/Ä/, '&Auml;').gsub(/Ö/, "&Ouml;") if s.class()=="asd".class()
-    return s
+    return s.encode('UTF-8')
   end
   def num_to_s(param)
     x = param.to_s.split(".")
