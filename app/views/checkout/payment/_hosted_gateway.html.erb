@@ -15,7 +15,7 @@ coder = HTMLEntities.new
       <% #Next, change where the form is pointing to -%>
       $('form[id=checkout_form_payment]').attr('action', '<%= escape_javascript(payment_method.get_server) %>');
       $('form').attr('method', 'post');
-      $('form').attr('accept-charset', 'utf-8');
+      $('form').attr('accept-charset', 'UTF-8');
 
 
       $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_amount, payment_method.get_amount(@order))) %>");
