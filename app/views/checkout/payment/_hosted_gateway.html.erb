@@ -21,16 +21,16 @@ coder = HTMLEntities.new
       $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_amount, payment_method.get_amount(@order))) %>");
       $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_reference, payment_method.get_reference(@order))) %>");
 
-      $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_buyername, payment_method.with_fire(payment_method.get_buyername(@order), :named))) %>");
-      $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_buyeraddress, payment_method.with_fire(payment_method.get_buyeraddress(@order), :named))) %>");
+      $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_buyername, (payment_method.get_buyername(@order)))) %>");
+      $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_buyeraddress, (payment_method.get_buyeraddress(@order)))) %>");
       $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_buyerpostalcode, payment_method.get_buyerpostalcode(@order))) %>");
-      $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_buyercity, payment_method.with_fire(payment_method.get_buyercity(@order), :named))) %>");
+      $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_buyercity, (payment_method.get_buyercity(@order)))) %>");
       $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_buyercountry, payment_method.get_buyercountry(@order))) %>");
       $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_buyeremail, payment_method.get_buyeremail(@order))) %>")
-      $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_deliveryname, payment_method.with_fire(payment_method.get_deliveryname(@order), :named))) %>");
-      $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_deliveryaddress, payment_method.with_fire(payment_method.get_deliveryaddress(@order), :named))) %>");
+      $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_deliveryname, (payment_method.get_deliveryname(@order)))) %>");
+      $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_deliveryaddress, (payment_method.get_deliveryaddress(@order)))) %>");
       $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_deliverypostalcode, payment_method.get_deliverypostalcode(@order))) %>");
-      $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_deliverycity, payment_method.with_fire(payment_method.get_deliverycity(@order), :named))) %>");
+      $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_deliverycity, (payment_method.get_deliverycity(@order)))) %>");
       $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_deliverycountry, payment_method.get_deliverycountry(@order))) %>");
       $('form').append("<%= escape_javascript(hidden_field_tag(:pmt_deliveryemail, payment_method.get_buyeremail(@order))) %>")
       

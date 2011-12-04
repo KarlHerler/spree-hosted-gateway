@@ -31,7 +31,8 @@ class ExternalGateway < PaymentMethod
   def with_fire(s, param=:named)
     coder = HTMLEntities.new
     s = coder.encode(s)
-    return s.tr('å', "&aring;").tr('ä', '&auml;').tr('ö', "&ouml;") if s.class()=="asd".class()
+    s =  s.tr('å', "&aring;").tr('ä', '&auml;').tr('ö', "&ouml;") if s.class()=="asd".class()
+    return s.tr('Å', "&Aring;").tr('Ä', '&Auml;').tr('Ö', "&Ouml;") if s.class()=="asd".class()
     #return s
   end
   def num_to_s(param)
@@ -262,7 +263,6 @@ class ExternalGateway < PaymentMethod
   #gets data for pmt_buyername
   def get_buyername(order)
     coder = HTMLEntities.new
-   
     return with_fire("#{order.bill_address.firstname} #{order.bill_address.lastname}", :named)
     #return "#{order.bill_address.firstname} #{order.bill_address.lastname}"
   end
